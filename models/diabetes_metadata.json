@@ -1,0 +1,139 @@
+{
+  "problem": "diabetes_prediction",
+  "source_dataset": "Base-de-datos/diabetes.csv",
+  "target_column": "Outcome",
+  "class_labels": {
+    "0": "No diabetes",
+    "1": "Diabetes"
+  },
+  "model_type": "RandomForestClassifier",
+  "model_path": "models/diabetes_random_forest.joblib",
+  "feature_columns": [
+    "Pregnancies",
+    "Glucose",
+    "BloodPressure",
+    "SkinThickness",
+    "Insulin",
+    "BMI",
+    "DiabetesPedigreeFunction",
+    "Age",
+    "BMI_Category_Normal",
+    "BMI_Category_Overweight",
+    "BMI_Category_Obese",
+    "AgeGroup_Adult",
+    "AgeGroup_Middle-aged",
+    "AgeGroup_Senior",
+    "Glucose_Category_Prediabetes",
+    "Glucose_Category_Diabetes",
+    "Insulin_Category_Normal",
+    "Insulin_Category_High",
+    "BP_Category_Elevated",
+    "BP_Category_High"
+  ],
+  "zero_invalid_columns": [
+    "Glucose",
+    "BloodPressure",
+    "SkinThickness",
+    "Insulin",
+    "BMI"
+  ],
+  "imputation_medians": {
+    "Glucose": 117.0,
+    "BloodPressure": 72.0,
+    "SkinThickness": 29.0,
+    "Insulin": 125.0,
+    "BMI": 32.3
+  },
+  "categorical_columns": [
+    "BMI_Category",
+    "AgeGroup",
+    "Glucose_Category",
+    "Insulin_Category",
+    "BP_Category"
+  ],
+  "category_definitions": {
+    "BMI_Category": {
+      "bins": [
+        0,
+        18.5,
+        25,
+        30,
+        100
+      ],
+      "labels": [
+        "Underweight",
+        "Normal",
+        "Overweight",
+        "Obese"
+      ]
+    },
+    "AgeGroup": {
+      "bins": [
+        0,
+        30,
+        45,
+        60,
+        100
+      ],
+      "labels": [
+        "Young",
+        "Adult",
+        "Middle-aged",
+        "Senior"
+      ]
+    },
+    "Glucose_Category": {
+      "bins": [
+        0,
+        100,
+        125,
+        200
+      ],
+      "labels": [
+        "Normal",
+        "Prediabetes",
+        "Diabetes"
+      ]
+    },
+    "Insulin_Category": {
+      "bins": [
+        0,
+        16,
+        166,
+        1000
+      ],
+      "labels": [
+        "Low",
+        "Normal",
+        "High"
+      ]
+    },
+    "BP_Category": {
+      "bins": [
+        0,
+        80,
+        90,
+        200
+      ],
+      "labels": [
+        "Normal",
+        "Elevated",
+        "High"
+      ]
+    }
+  },
+  "best_params": {
+    "max_depth": 5,
+    "min_samples_leaf": 1,
+    "min_samples_split": 10,
+    "n_estimators": 50
+  },
+  "best_cv_f1": 0.6513309841555456,
+  "test_metrics": {
+    "accuracy": 0.7467532467532467,
+    "precision": 0.6744186046511628,
+    "recall": 0.5370370370370371,
+    "f1": 0.5979381443298969,
+    "roc_auc": 0.8231481481481482
+  }
+}

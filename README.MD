@@ -109,6 +109,27 @@ jupyter notebook Supervisado/Diabetes-Prediction.ipynb
 # ... continuar con los demás notebooks
 ```
 
+### Modelos guardados para la app
+
+Los notebooks supervisados entrenan y guardan sus modelos al final usando `joblib`.
+
+Para regenerarlos, ejecutar todas las celdas de:
+
+- `Supervisado/Diabetes-Prediction.ipynb`
+- `Supervisado/Prediccion-paro-cardiaco.ipynb`
+
+Los artefactos se guardan en `models/`:
+
+- `diabetes_random_forest.joblib`
+- `diabetes_model.joblib`
+- `diabetes_metadata.json`
+- `paro_cardiaco_best_model.joblib`
+- `paro_cardiaco_scaler.joblib`
+- `paro_cardiaco_model.joblib`
+- `paro_cardiaco_metadata.json`
+
+Los archivos `*_model.joblib` son bundles pensados para la aplicacion, porque incluyen el modelo y los metadatos necesarios para preparar los datos antes de predecir.
+
 ## Conclusiones
 
 [Espacio para conclusiones finales del proyecto]

@@ -1,0 +1,49 @@
+{
+  "problem": "paro_cardiaco_prediction",
+  "source_dataset": "Base-de-datos/Medicaldataset.csv",
+  "target_column": "Result",
+  "class_labels": {
+    "0": "Negative",
+    "1": "Positive"
+  },
+  "best_model": "logistic_regression",
+  "model_path": "models/paro_cardiaco_best_model.joblib",
+  "scaler_path": "models/paro_cardiaco_scaler.joblib",
+  "feature_columns": [
+    "Age",
+    "Gender",
+    "Heart rate",
+    "Systolic blood pressure",
+    "Diastolic blood pressure",
+    "Blood sugar",
+    "CK-MB",
+    "Troponin"
+  ],
+  "label_mapping": {
+    "negative": 0,
+    "positive": 1
+  },
+  "test_metrics_by_model": {
+    "support_vector_machine": {
+      "accuracy": 0.7803030303030303,
+      "precision": 0.8482142857142857,
+      "recall": 0.7818930041152263,
+      "f1": 0.8137044967880086,
+      "roc_auc": 0.8765028645202937
+    },
+    "k_nearest_neighbors": {
+      "accuracy": 0.6212121212121212,
+      "precision": 0.7104072398190046,
+      "recall": 0.6460905349794238,
+      "f1": 0.6767241379310345,
+      "roc_auc": 0.6725301917749267
+    },
+    "logistic_regression": {
+      "accuracy": 0.7777777777777778,
+      "precision": 0.8189300411522634,
+      "recall": 0.8189300411522634,
+      "f1": 0.8189300411522634,
+      "roc_auc": 0.8689044890933054
+    }
+  }
+}
