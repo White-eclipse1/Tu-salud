@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tu Salud — Análisis Predictivo de Riesgos Médicos</title>
+  <meta name="description" content="Proyecto académico de análisis predictivo de riesgos médicos mediante machine learning." />
+  <link rel="stylesheet" href="css/styles.css" />
+  <!-- Favicon inline -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🩺</text></svg>" />
+</head>
+<body>
+
+  <!-- ─── NAVEGACIÓN ─── -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">🩺</div>
+        <span class="nav-logo-text">Tu <span>Salud</span></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="active">Análisis</a></li>
+        <li><a href="about.html">Acerca del proyecto</a></li>
+        <li><span class="nav-badge">Demo Académico</span></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="page-wrapper">
+    <div class="container">
+
+      <!-- ─── HERO ─── -->
+      <div class="page-hero">
+        <div class="page-hero-tag">Análisis Predictivo · Machine Learning</div>
+        <h1>Evaluación de<br><span class="accent">Riesgos Médicos</span></h1>
+        <p>Ingresa los datos clínicos del paciente para obtener una estimación visual de riesgo basada en modelos de aprendizaje automático.</p>
+      </div>
+
+      <!-- ─── DISCLAIMER ─── -->
+      <div class="disclaimer-banner">
+        <span class="icon">⚠️</span>
+        <p>
+          <strong>Aviso académico:</strong> Esta aplicación es un prototipo educativo. Los resultados mostrados son 
+          una <strong>simulación demostrativa del frontend</strong> y <strong>no constituyen un diagnóstico médico real</strong>. 
+          No sustituye la consulta con un profesional de salud.
+        </p>
+      </div>
+
+      <!-- ─── STATS ROW ─── -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value">3</div>
+          <div class="stat-label">Condiciones analizadas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">ML</div>
+          <div class="stat-label">Modelos predictivos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">11</div>
+          <div class="stat-label">Variables clínicas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">CSV</div>
+          <div class="stat-label">Datasets reales</div>
+        </div>
+      </div>
+
+      <!-- ─── FORMULARIO ─── -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon blue">📋</div>
+          <div>
+            <div class="card-title">Datos del Paciente</div>
+            <div class="card-subtitle">Completa los campos clínicos para iniciar el análisis</div>
+          </div>
+        </div>
+
+        <form id="patient-form" novalidate>
+
+          <!-- Sección: Identificación -->
+          <div class="form-section-label" style="font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:1rem;">
+            01 — Identificación
+          </div>
+          <div class="form-grid">
+
+            <div class="form-group" style="grid-column: span 2">
+              <label class="form-label" for="patient-name">
+                Nombre o identificador
+              </label>
+              <input
+                class="form-input"
+                type="text"
+                id="patient-name"
+                name="patient-name"
+                placeholder="Ej. Paciente-001 o nombre completo"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="age">
+                Edad <span class="form-label-hint">(años)</span>
+              </label>
+              <div class="input-with-unit">
+                <input
+                  class="form-input"
+                  type="number"
+                  id="age"
+                  name="age"
+                  min="0" max="120"
+                  placeholder="Ej. 45"
+                  required
+                />
+                <span class="input-unit">años</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="sex">Sexo biológico</label>
+              <select class="form-select" id="sex" name="sex" required>
+                <option value="" disabled selected>Seleccionar</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+              </select>
+            </div>
+
+          </div>
+
+          <div class="section-divider"></div>
+
+          <!-- Sección: Signos vitales -->
+          <div class="form-section-label" style="font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:1rem;">
+            02 — Signos Vitales y Biometría
+          </div>
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label class="form-label" for="glucose">
+                Glucosa en sangre
+              </label>
+              <div class="input-with-unit">
+                <input
+                  class="form-input"
+                  type="number"
+                  id="glucose"
+                  name="glucose"
+                  min="40" max="500"
+                  placeholder="Ej. 95"
+                  required
+                />
+                <span class="input-unit">mg/dL</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="bp_systolic">
+                Presión arterial sistólica
+              </label>
+              <div class="input-with-unit">
+                <input
+                  class="form-input"
+                  type="number"
+                  id="bp_systolic"
+                  name="bp_systolic"
+                  min="60" max="250"
+                  placeholder="Ej. 120"
+                  required
+                />
+                <span class="input-unit">mmHg</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="heart_rate">
+                Frecuencia cardíaca
+              </label>
+              <div class="input-with-unit">
+                <input
+                  class="form-input"
+                  type="number"
+                  id="heart_rate"
+                  name="heart_rate"
+                  min="20" max="250"
+                  placeholder="Ej. 72"
+                  required
+                />
+                <span class="input-unit">bpm</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cholesterol">
+                Colesterol total
+              </label>
+              <div class="input-with-unit">
+                <input
+                  class="form-input"
+                  type="number"
+                  id="cholesterol"
+                  name="cholesterol"
+                  min="50" max="600"
+                  placeholder="Ej. 190"
+                />
+                <span class="input-unit">mg/dL</span>
+              </div>
+            </div>
+
+            <!-- IMC con slider -->
+            <div class="form-group" style="grid-column: span 2">
+              <label class="form-label" for="bmi">
+                Índice de Masa Corporal (IMC)
+                <span class="form-label-hint" id="bmi-display">22.0</span>
+              </label>
+              <div class="form-range-container">
+                <input
+                  class="form-range"
+                  type="range"
+                  id="bmi"
+                  name="bmi"
+                  min="10" max="60" step="0.1"
+                  value="22"
+                  data-display="bmi-display"
+                  data-unit=" kg/m²"
+                />
+                <div class="range-value-row">
+                  <span class="range-limits">10</span>
+                  <div style="display:flex;gap:1rem;font-size:0.72rem;color:var(--text-muted);text-align:center">
+                    <span>Bajo peso<br>&lt;18.5</span>
+                    <span>Normal<br>18.5–24.9</span>
+                    <span>Sobrepeso<br>25–29.9</span>
+                    <span>Obesidad<br>≥30</span>
+                  </div>
+                  <span class="range-limits">60</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="section-divider"></div>
+
+          <!-- Sección: Factores de riesgo -->
+          <div class="form-section-label" style="font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:1rem;">
+            03 — Factores de Riesgo Adicionales
+          </div>
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label class="form-label" for="smoking">Tabaquismo</label>
+              <select class="form-select" id="smoking" name="smoking">
+                <option value="no">No fumador</option>
+                <option value="yes">Fumador activo</option>
+                <option value="ex">Ex fumador</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="physical_activity">Actividad física</label>
+              <select class="form-select" id="physical_activity" name="physical_activity">
+                <option value="low">Baja (sedentario)</option>
+                <option value="moderate" selected>Moderada</option>
+                <option value="high">Alta (ejercicio regular)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="family_history">Antecedentes familiares</label>
+              <select class="form-select" id="family_history" name="family_history">
+                <option value="no">Sin antecedentes</option>
+                <option value="yes">Con antecedentes (DM, HTA, cardíaco)</option>
+              </select>
+            </div>
+
+          </div>
+
+          <!-- Acciones -->
+          <div class="form-actions">
+            <button type="submit" id="analyze-btn" class="btn btn-primary btn-lg">
+              <div class="spinner"></div>
+              <span class="btn-icon">🔬</span>
+              Analizar riesgo
+            </button>
+            <button type="button" id="reset-btn" class="btn btn-secondary">
+              <span>↺</span> Limpiar
+            </button>
+            <span class="form-actions-note">
+              Los datos no se almacenan ni se envían a ningún servidor.
+            </span>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- ─── RESULTADOS (ocultos hasta analizar) ─── -->
+      <div id="results-section" class="hidden" style="margin-top: 2.5rem;"></div>
+
+    </div><!-- /container -->
+
+    <!-- ─── FOOTER ─── -->
+    <footer class="footer">
+      <p class="footer-text">
+        <strong>Tu Salud</strong> — Proyecto académico de análisis predictivo de riesgos médicos.<br />
+        Los resultados son simulaciones visuales. No constituyen diagnóstico médico.<br />
+        <span style="color:var(--text-muted)">© <span id="current-year"></span> · Desarrollado con fines educativos</span>
+      </p>
+    </footer>
+
+  </div><!-- /page-wrapper -->
+
+  <script src="js/app.js"></script>
+</body>
+</html>
