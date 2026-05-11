@@ -1,0 +1,91 @@
+{
+  "approach": "KMeans por enfermedad; k elegido por silhouette en [2,6]",
+  "datasets": {
+    "diabetes": {
+      "k": 2,
+      "silhouette": 0.19627861483317974
+    },
+    "paro_cardiaco": {
+      "k": 5,
+      "silhouette": 0.23867401034829452
+    },
+    "hipertension": {
+      "k": 4,
+      "silhouette": 0.2990179749717088
+    }
+  },
+  "summary_per_cluster": {
+    "diabetes": [
+      {
+        "cluster": 0,
+        "n": 351,
+        "pct_positivos": 0.556,
+        "proba_media_modelo": 0.529
+      },
+      {
+        "cluster": 1,
+        "n": 417,
+        "pct_positivos": 0.175,
+        "proba_media_modelo": 0.19
+      }
+    ],
+    "paro_cardiaco": [
+      {
+        "cluster": 0,
+        "n": 429,
+        "pct_positivos": 0.531,
+        "proba_media_modelo": 0.526
+      },
+      {
+        "cluster": 1,
+        "n": 3,
+        "pct_positivos": 0.667,
+        "proba_media_modelo": 0.923
+      },
+      {
+        "cluster": 2,
+        "n": 825,
+        "pct_positivos": 0.629,
+        "proba_media_modelo": 0.623
+      },
+      {
+        "cluster": 3,
+        "n": 23,
+        "pct_positivos": 0.957,
+        "proba_media_modelo": 1.0
+      },
+      {
+        "cluster": 4,
+        "n": 39,
+        "pct_positivos": 1.0,
+        "proba_media_modelo": 1.0
+      }
+    ],
+    "hipertension": [
+      {
+        "cluster": 0,
+        "n": 2847,
+        "pct_positivos": 0.763,
+        "proba_media_modelo": 0.763
+      },
+      {
+        "cluster": 1,
+        "n": 915,
+        "pct_positivos": 0.197,
+        "proba_media_modelo": 0.198
+      },
+      {
+        "cluster": 2,
+        "n": 133,
+        "pct_positivos": 0.774,
+        "proba_media_modelo": 0.767
+      },
+      {
+        "cluster": 3,
+        "n": 468,
+        "pct_positivos": 0.771,
+        "proba_media_modelo": 0.768
+      }
+    ]
+  }
+}

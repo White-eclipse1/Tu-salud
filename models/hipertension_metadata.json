@@ -1,0 +1,76 @@
+{
+  "target_column": "riesgo_hipertension",
+  "class_labels": {
+    "0": "Sin riesgo",
+    "1": "Riesgo de hipertensión"
+  },
+  "feature_columns": [
+    "sexo",
+    "edad",
+    "concentracion_hemoglobina",
+    "temperatura_ambiente",
+    "valor_acido_urico",
+    "valor_albumina",
+    "valor_colesterol_hdl",
+    "valor_colesterol_ldl",
+    "valor_colesterol_total",
+    "valor_creatina",
+    "resultado_glucosa",
+    "valor_insulina",
+    "valor_trigliceridos",
+    "resultado_glucosa_promedio",
+    "valor_hemoglobina_glucosilada",
+    "valor_ferritina",
+    "valor_folato",
+    "valor_homocisteina",
+    "valor_proteinac_reactiva",
+    "valor_transferrina",
+    "valor_vitamina_bdoce",
+    "valor_vitamina_d",
+    "peso",
+    "estatura",
+    "medida_cintura",
+    "segundamedicion_peso",
+    "segundamedicion_estatura",
+    "distancia_rodilla_talon",
+    "circunferencia_de_la_pantorrilla",
+    "segundamedicion_cintura",
+    "tension_arterial",
+    "sueno_horas",
+    "masa_corporal",
+    "actividad_total"
+  ],
+  "best_model_name": "GradientBoosting",
+  "models_compared": [
+    "LogisticRegression",
+    "RandomForest",
+    "GradientBoosting"
+  ],
+  "test_metrics": {
+    "LogisticRegression": {
+      "accuracy": 0.849942726231386,
+      "precision": 0.8552631578947368,
+      "recall": 0.9236234458259325,
+      "f1": 0.888129803586678,
+      "roc_auc": 0.9032945625393914
+    },
+    "RandomForest": {
+      "accuracy": 0.9919816723940436,
+      "precision": 0.9964285714285714,
+      "recall": 0.9911190053285968,
+      "f1": 0.993766696349065,
+      "roc_auc": 0.99963043602819
+    },
+    "GradientBoosting": {
+      "accuracy": 0.997709049255441,
+      "precision": 1.0,
+      "recall": 0.9964476021314387,
+      "f1": 0.998220640569395,
+      "roc_auc": 1.0
+    }
+  },
+  "imputation_medians": {},
+  "random_state": 42,
+  "test_size": 0.2,
+  "scaler": "StandardScaler"
+}
