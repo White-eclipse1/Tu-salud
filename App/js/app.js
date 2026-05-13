@@ -1,27 +1,39 @@
-/* ============================================================
-   TU SALUD — app.js
-   Lógica del formulario, simulación de riesgos y renderizado
-   ============================================================ */
+const API_URL = 'http://localhost:8000/predict';
+const CLUSTER_URL = 'http://localhost:8000/cluster';
 
-// ──────────────────────────────────────────────
-// CONSTANTES Y CONFIG
-// ──────────────────────────────────────────────
 const RISK_LEVELS = {
-  low:      { label: 'Bajo',     class: 'low',      badge: 'badge-low',      note: 'Los indicadores están dentro de rangos saludables. Se recomienda mantener hábitos preventivos.' },
-  moderate: { label: 'Moderado', class: 'moderate',  badge: 'badge-moderate', note: 'Algunos indicadores sugieren vigilancia. Se recomienda consultar a un médico.' },
-  high:     { label: 'Alto',     class: 'high',      badge: 'badge-high',     note: 'Indicadores fuera de rango. Evaluación médica profesional recomendada a la brevedad.' },
-  critical: { label: 'Crítico',  class: 'critical',  badge: 'badge-critical', note: 'Valores críticos detectados. Se recomienda atención médica urgente.' },
+  low: {
+    label: 'Bajo',
+    class: 'low',
+    badge: 'badge-low',
+    note: 'Los indicadores estan dentro de rangos saludables. Se recomienda mantener habitos preventivos.',
+  },
+  moderate: {
+    label: 'Moderado',
+    class: 'moderate',
+    badge: 'badge-moderate',
+    note: 'Algunos indicadores sugieren vigilancia. Se recomienda consultar a un medico.',
+  },
+  high: {
+    label: 'Alto',
+    class: 'high',
+    badge: 'badge-high',
+    note: 'Indicadores fuera de rango. Evaluacion medica profesional recomendada a la brevedad.',
+  },
+  critical: {
+    label: 'Critico',
+    class: 'critical',
+    badge: 'badge-critical',
+    note: 'Valores criticos detectados. Se recomienda atencion medica urgente.',
+  },
 };
 
 const CONDITIONS = [
-  { id: 'diabetes',   label: 'Riesgo — Diabetes',              icon: '🩸' },
-  { id: 'hipert',     label: 'Riesgo — Hipertensión Arterial',  icon: '❤️' },
-  { id: 'cardio',     label: 'Riesgo — Paro Cardíaco',          icon: '⚡' },
+  { id: 'diabetes', label: 'Riesgo - Diabetes', icon: 'Dx' },
+  { id: 'hipert', label: 'Riesgo - Hipertension Arterial', icon: 'HTA' },
+  { id: 'cardio', label: 'Riesgo - Paro Cardiaco', icon: 'PC' },
 ];
 
-// ──────────────────────────────────────────────
-// INICIALIZACIÓN
-// ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initRangeInputs();
   initForm();
@@ -29,9 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
   setCurrentYear();
 });
 
-// ──────────────────────────────────────────────
-// RANGE INPUTS — actualizar valor en pantalla
-// ──────────────────────────────────────────────
 function initRangeInputs() {
   const ranges = document.querySelectorAll('.form-range');
   ranges.forEach(range => {
@@ -39,7 +48,6 @@ function initRangeInputs() {
     if (!display) return;
     const update = () => {
       display.textContent = `${range.value}${range.dataset.unit || ''}`;
-      // Actualizar color de fondo del track
       const pct = ((range.value - range.min) / (range.max - range.min)) * 100;
       range.style.background = `linear-gradient(90deg, var(--blue-primary) ${pct}%, var(--bg-input) ${pct}%)`;
     };
@@ -48,36 +56,30 @@ function initRangeInputs() {
   });
 }
 
-// ──────────────────────────────────────────────
-// FORMULARIO — submit
-// ──────────────────────────────────────────────
 function initForm() {
   const form = document.getElementById('patient-form');
   if (!form) return;
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
 
     const btn = form.querySelector('#analyze-btn');
     btn.classList.add('loading');
     btn.disabled = true;
 
-    // Leer datos del formulario
-    const data = readFormData(form);
+    try {
+      const data = readFormData(form);
+      const clusters = await getClustersFromModel(data);
+      renderUnsupervisedAnalysis(data, clusters);
+      const risks = await getRisksFromModel(data);
+      renderResults(data, risks, clusters);
+    } catch (error) {
+      renderError(error.message || 'No se pudo conectar con el backend de prediccion.');
+    } finally {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
 
-    // Simular latencia de modelo (demo)
-    await delay(1400);
-
-    // Calcular riesgos simulados
-    const risks = simulateRisks(data);
-
-    // Renderizar resultados
-    renderResults(data, risks);
-
-    btn.classList.remove('loading');
-    btn.disabled = false;
-
-    // Scroll suave a resultados
     const resultsSection = document.getElementById('results-section');
     if (resultsSection) {
       resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -96,162 +98,135 @@ function initResetButton() {
   });
 }
 
-// ──────────────────────────────────────────────
-// LEER FORMULARIO
-// ──────────────────────────────────────────────
 function readFormData(form) {
   const fd = new FormData(form);
-  return {
-    name:           fd.get('patient-name')   || 'Paciente',
-    age:            parseInt(fd.get('age'))  || 0,
-    sex:            fd.get('sex')            || 'N/E',
-    glucose:        parseFloat(fd.get('glucose'))  || 0,
-    bp_systolic:    parseInt(fd.get('bp_systolic')) || 0,
-    bmi:            parseFloat(fd.get('bmi'))       || 0,
-    heart_rate:     parseInt(fd.get('heart_rate'))  || 0,
-    cholesterol:    parseInt(fd.get('cholesterol')) || 0,
-    smoking:        fd.get('smoking')        || 'no',
-    physical_activity: fd.get('physical_activity') || 'moderate',
-    family_history: fd.get('family_history') || 'no',
-  };
+  const data = { name: fd.get('patient-name') || 'Paciente' };
+
+  fd.forEach((value, key) => {
+    if (key === 'patient-name' || value === '') return;
+    const numericValue = Number(value);
+    data[key] = Number.isNaN(numericValue) ? value : numericValue;
+  });
+
+  return data;
 }
 
-// ──────────────────────────────────────────────
-// SIMULACIÓN DE RIESGOS
-// Nota: Algoritmo demostrativo, no médico.
-// En producción conectar con modelos Python.
-// ──────────────────────────────────────────────
-function simulateRisks(d) {
-  // Score base por condición — puntos de riesgo acumulados
-  let scores = { diabetes: 0, hipert: 0, cardio: 0 };
+async function getRisksFromModel(data) {
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
 
-  // ── Glucosa (normal < 100, pre-diabético 100-125, diabético >= 126)
-  if (d.glucose >= 126)     scores.diabetes += 40;
-  else if (d.glucose >= 100) scores.diabetes += 20;
-  else if (d.glucose >= 90)  scores.diabetes += 5;
-
-  // ── Presión sistólica (normal < 120, elevada 120-129, hipert1 130-139, hipert2 >= 140)
-  if (d.bp_systolic >= 160)      scores.hipert += 50; scores.cardio += 20;
-  if (d.bp_systolic >= 140)      { scores.hipert += 35; scores.cardio += 15; }
-  else if (d.bp_systolic >= 130) { scores.hipert += 20; scores.cardio += 8; }
-  else if (d.bp_systolic >= 120) { scores.hipert += 8; }
-
-  // ── IMC (normal 18.5-24.9)
-  if (d.bmi >= 35)       { scores.diabetes += 20; scores.cardio += 15; }
-  else if (d.bmi >= 30)  { scores.diabetes += 12; scores.cardio += 8; }
-  else if (d.bmi >= 25)  { scores.diabetes += 5; scores.cardio += 3; }
-
-  // ── Frecuencia cardíaca (normal 60-100)
-  if (d.heart_rate > 120 || d.heart_rate < 45) scores.cardio += 25;
-  else if (d.heart_rate > 100 || d.heart_rate < 55) scores.cardio += 12;
-
-  // ── Colesterol
-  if (d.cholesterol >= 240)      { scores.cardio += 20; scores.hipert += 5; }
-  else if (d.cholesterol >= 200) { scores.cardio += 10; }
-
-  // ── Edad
-  const ageFactor = d.age > 65 ? 1.4 : d.age > 50 ? 1.2 : d.age > 40 ? 1.05 : 1.0;
-  Object.keys(scores).forEach(k => { scores[k] = Math.round(scores[k] * ageFactor); });
-
-  // ── Tabaquismo
-  if (d.smoking === 'yes') { scores.cardio += 20; scores.hipert += 10; }
-
-  // ── Antecedentes familiares
-  if (d.family_history === 'yes') {
-    scores.diabetes += 15; scores.hipert += 10; scores.cardio += 15;
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const detail = Array.isArray(payload.detail)
+      ? payload.detail.map(item => item.msg).join(', ')
+      : payload.detail;
+    throw new Error(detail || 'Error en la prediccion del backend.');
   }
-
-  // ── Actividad física
-  if (d.physical_activity === 'low') {
-    scores.diabetes += 10; scores.cardio += 8;
-  } else if (d.physical_activity === 'high') {
-    scores.diabetes -= 8; scores.cardio -= 5; scores.hipert -= 5;
-  }
-
-  // Normalizar a porcentaje 0-100
-  const normalize = (v, cap = 100) => Math.min(Math.max(Math.round(v), 0), cap);
-  const pct = {
-    diabetes: normalize(scores.diabetes),
-    hipert:   normalize(scores.hipert),
-    cardio:   normalize(scores.cardio),
-  };
-
-  // Riesgo general = promedio ponderado
-  pct.general = normalize(Math.round(pct.diabetes * 0.3 + pct.hipert * 0.35 + pct.cardio * 0.35));
-
-  // Clasificar nivel
-  const classify = (v) =>
-    v >= 70 ? 'critical' : v >= 45 ? 'high' : v >= 20 ? 'moderate' : 'low';
-
-  return {
-    diabetes: { pct: pct.diabetes, level: classify(pct.diabetes) },
-    hipert:   { pct: pct.hipert,   level: classify(pct.hipert) },
-    cardio:   { pct: pct.cardio,   level: classify(pct.cardio) },
-    general:  { pct: pct.general,  level: classify(pct.general) },
-  };
+  return payload;
 }
 
-// ──────────────────────────────────────────────
-// RENDERIZAR RESULTADOS
-// ──────────────────────────────────────────────
-function renderResults(data, risks) {
+async function getClustersFromModel(data) {
+  const response = await fetch(CLUSTER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const detail = Array.isArray(payload.detail)
+      ? payload.detail.map(item => item.msg).join(', ')
+      : payload.detail;
+    throw new Error(detail || 'Error en el modelo no supervisado.');
+  }
+  return payload;
+}
+
+function renderUnsupervisedAnalysis(data, clusters) {
   const container = document.getElementById('results-section');
   if (!container) return;
 
-  container.innerHTML = buildResultsHTML(data, risks);
+  container.innerHTML = `
+    <div class="results-section">
+      ${buildClusterHTML(clusters, null)}
+      <div class="card" style="margin-top:1.2rem">
+        <div class="card-header" style="margin-bottom:0;padding-bottom:0;border-bottom:0">
+          <div class="card-header-icon blue">ML</div>
+          <div>
+            <div class="card-title">Ejecutando modelos supervisados...</div>
+            <div class="card-subtitle">Comparando los clusters con las probabilidades individuales</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  container.classList.remove('hidden');
+}
+
+function renderResults(data, risks, clusters) {
+  const container = document.getElementById('results-section');
+  if (!container) return;
+
+  container.innerHTML = buildResultsHTML(data, risks, clusters);
   container.classList.remove('hidden');
 
-  // Animar barras con delay
   requestAnimationFrame(() => {
     setTimeout(() => {
       container.querySelectorAll('.result-bar-fill').forEach(bar => {
-        bar.style.width = bar.dataset.width + '%';
+        bar.style.width = `${bar.dataset.width}%`;
       });
     }, 100);
   });
 
-  // Animar gauge circular
   animateGauge(risks.general.pct, risks.general.level);
 }
 
-function buildResultsHTML(data, risks) {
-  const sexLabel = data.sex === 'M' ? 'Masculino' : data.sex === 'F' ? 'Femenino' : 'N/E';
+function renderError(message) {
+  const container = document.getElementById('results-section');
+  if (!container) return;
+  container.innerHTML = `
+    <div class="results-section">
+      <div class="disclaimer-banner" style="margin-bottom:0">
+        <span class="icon">!</span>
+        <p><strong>No se pudo generar la prediccion:</strong> ${escapeHTML(message)}</p>
+      </div>
+    </div>
+  `;
+  container.classList.remove('hidden');
+}
+
+function buildResultsHTML(data, risks, clusters) {
+  const sexLabel = data.sex === 'M' || data.sex === 1 ? 'Masculino' : data.sex === 'F' || data.sex === 2 ? 'Femenino' : 'N/E';
   const generalInfo = RISK_LEVELS[risks.general.level];
 
   return `
     <div class="results-section">
-      <!-- Resumen del paciente -->
+      ${clusters ? buildClusterHTML(clusters, risks) : ''}
+
       <div class="patient-summary">
-        <div class="patient-avatar">${data.sex === 'F' ? '👩' : '👨'}</div>
+        <div class="patient-avatar">${sexLabel === 'Femenino' ? 'F' : 'M'}</div>
         <div>
           <div class="patient-name">${escapeHTML(data.name)}</div>
-          <div class="patient-meta">Análisis generado ${formatTime()}</div>
+          <div class="patient-meta">Analisis generado ${formatTime()}</div>
         </div>
         <div class="patient-chips">
-          <span class="chip">${data.age} años</span>
+          <span class="chip">${data.age} anos</span>
           <span class="chip">${sexLabel}</span>
           <span class="chip">IMC ${data.bmi}</span>
           <span class="chip">Glucosa ${data.glucose} mg/dL</span>
-          <span class="chip">PA ${data.bp_systolic} mmHg</span>
+          <span class="chip">PA ${data.bp_systolic}/${data.bp_diastolic} mmHg</span>
         </div>
       </div>
 
-      <!-- Grid de resultados -->
       <div class="results-grid">
-
-        <!-- Riesgo General -->
         <div class="result-card ${risks.general.level} result-general">
           <div class="result-general-gauge">
             <svg width="120" height="120" viewBox="0 0 120 120" id="gauge-svg">
-              <circle cx="60" cy="60" r="50"
-                fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="10"/>
-              <circle cx="60" cy="60" r="50"
-                fill="none" stroke-width="10"
-                stroke-linecap="round"
-                stroke-dasharray="314"
-                stroke-dashoffset="314"
-                id="gauge-circle"
-                class="gauge-ring-${risks.general.level}"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(20,96,112,0.10)" stroke-width="10"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314" id="gauge-circle"/>
             </svg>
             <div class="gauge-text">
               <span class="gauge-pct" id="gauge-pct-val" style="color:${gaugeColor(risks.general.level)}">0%</span>
@@ -259,26 +234,201 @@ function buildResultsHTML(data, risks) {
             </div>
           </div>
           <div class="result-general-info">
-            <div class="result-condition">Evaluación de Riesgo General</div>
+            <div class="result-condition">Evaluacion de Riesgo General</div>
             <h3>Nivel ${generalInfo.label}
               <span class="result-badge ${generalInfo.badge}" style="margin-left:8px">${generalInfo.label}</span>
             </h3>
             <p>${generalInfo.note}</p>
-            <span class="text-muted" style="font-size:0.75rem">⚠️ Resultado demostrativo — No es un diagnóstico médico.</span>
+            <span class="text-muted" style="font-size:0.75rem">Resultado generado por modelos entrenados. No es un diagnostico medico.</span>
           </div>
         </div>
 
-        ${CONDITIONS.map(c => buildConditionCard(c, risks[c.id])).join('')}
-
+        ${CONDITIONS.map(condition => buildConditionCard(condition, risks[condition.id])).join('')}
       </div>
+
+      ${clusters ? buildClusterComparisonHTML(clusters, risks) : ''}
 
       <div style="margin-top:1.5rem; text-align:center">
         <button class="btn btn-secondary" onclick="window.print()">
-          <span class="btn-icon">🖨️</span> Imprimir reporte
+          <span class="btn-icon">PDF</span> Imprimir reporte
         </button>
         <button class="btn btn-ghost" id="new-analysis-btn" style="margin-left:0.5rem">
-          <span class="btn-icon">↩</span> Nuevo análisis
+          <span class="btn-icon">+</span> Nuevo analisis
         </button>
+      </div>
+    </div>
+  `;
+}
+
+function buildClusterHTML(clusters, risks) {
+  const rows = [
+    { key: 'diabetes', label: 'Diabetes', color: '#0f7c93' },
+    { key: 'hipert', label: 'Hipertension', color: '#c2413a' },
+    { key: 'cardio', label: 'Paro cardiaco', color: '#18a878' },
+  ];
+
+  return `
+    <div class="card cluster-card">
+      <div class="card-header">
+        <div class="card-header-icon green">KM</div>
+        <div>
+          <div class="card-title">Modelo no supervisado: grupos K-Means</div>
+          <div class="card-subtitle">Primero se ubica al paciente dentro del grupo mas parecido a sus datos</div>
+        </div>
+      </div>
+
+      <div class="cluster-map-grid" aria-label="Mapa grafico de pertenencia por clusters">
+        ${rows.map(row => buildClusterMap(row, clusters[row.key], risks ? risks[row.key] : null)).join('')}
+      </div>
+
+      <div class="cluster-summary">
+        <div>
+          <span class="stat-label">Riesgo general por clusters</span>
+          <strong>${clusters.general.cluster_risk_pct}%</strong>
+        </div>
+        <p>El grupo marcado es el cluster al que perteneces segun K-Means. El porcentaje del grupo viene del comportamiento historico de pacientes parecidos.</p>
+      </div>
+    </div>
+  `;
+}
+
+function buildClusterMap(row, item, risk) {
+  const patientGroup = getPatientGroup(item);
+  const relationHTML = risk ? buildMiniRelation(item.cluster_risk_pct, risk.pct) : '';
+  const maxN = Math.max(...item.groups.map(group => group.n));
+
+  return `
+    <section class="cluster-map-card">
+      <div class="cluster-map-head">
+        <div>
+          <strong>${row.label}</strong>
+          <span>${item.group_label}</span>
+        </div>
+        <span class="cluster-pill ${item.level}">Grupo ${item.cluster}</span>
+      </div>
+
+      <div class="cluster-real-summary" style="--cluster-color:${row.color}">
+        <div class="assigned-cluster-card">
+          <div class="assigned-cluster-ring">
+            <span>${item.cluster}</span>
+          </div>
+          <div>
+            <span class="result-condition">Grupo asignado por K-Means</span>
+            <strong>${item.group_label}</strong>
+            <p>El modelo asigno este grupo usando la distancia real del paciente al centroide entrenado.</p>
+          </div>
+        </div>
+
+        <div class="cluster-groups-list">
+          ${item.groups.map(group => `
+            <div class="cluster-group-row ${group.is_patient_group ? 'selected' : ''}">
+              <div class="cluster-group-id">
+                <span>${group.cluster}</span>
+              </div>
+              <div class="cluster-group-body">
+                <div class="cluster-group-title">
+                  <strong>${group.is_patient_group ? item.group_label : `Cluster ${group.cluster}`}</strong>
+                  <span>${group.is_patient_group ? 'Paciente pertenece aqui' : 'Grupo disponible'}</span>
+                </div>
+                <div class="cluster-group-meter">
+                  <div style="width:${Math.max(8, (group.n / maxN) * 100)}%;background:${group.is_patient_group ? row.color : 'rgba(20,96,112,0.28)'}"></div>
+                </div>
+              </div>
+              <div class="cluster-group-values">
+                <span>n=${group.n}</span>
+                <strong>${group.cluster_risk_pct}%</strong>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="cluster-map-stats">
+        <div>
+          <span>Grupo asignado</span>
+          <strong>${item.group_label}</strong>
+        </div>
+        <div>
+          <span>Riesgo del grupo</span>
+          <strong>${item.cluster_risk_pct}%</strong>
+        </div>
+        <div>
+          <span>Pacientes similares</span>
+          <strong>${item.n}</strong>
+        </div>
+        <div>
+          <span>Distancia al centroide</span>
+          <strong>${item.distance_to_center}</strong>
+        </div>
+      </div>
+
+      <div class="cluster-affinity">
+        <div class="cluster-affinity-label">
+          <span>Afinidad al centroide</span>
+          <strong>${patientGroup.affinity_pct}%</strong>
+        </div>
+        <div class="cluster-affinity-track">
+          <div style="width:${patientGroup.affinity_pct}%;background:${row.color}"></div>
+        </div>
+      </div>
+
+      ${relationHTML}
+      <p class="cluster-footnote">k=${item.k} · silhouette ${item.silhouette} · distancia ${item.distance_to_center}</p>
+    </section>
+  `;
+}
+
+function getPatientGroup(item) {
+  return item.groups.find(group => group.is_patient_group) || item.groups[0];
+}
+
+function buildMiniRelation(clusterPct, modelPct) {
+  const diff = Math.abs(modelPct - clusterPct);
+  const relation = diff <= 15 ? 'Relacion fuerte' : diff <= 30 ? 'Relacion parcial' : 'Diferencia alta';
+  return `
+    <div class="cluster-relation">
+      <span>Cluster ${clusterPct}%</span>
+      <span>Supervisado ${modelPct}%</span>
+      <strong>${relation}</strong>
+    </div>
+  `;
+}
+
+function buildClusterComparisonHTML(clusters, risks) {
+  const items = [
+    { key: 'diabetes', label: 'Diabetes' },
+    { key: 'hipert', label: 'Hipertension' },
+    { key: 'cardio', label: 'Paro cardiaco' },
+  ];
+
+  return `
+    <div class="card comparison-card">
+      <div class="card-header">
+        <div class="card-header-icon amber">CMP</div>
+        <div>
+          <div class="card-title">Comparacion cluster vs modelo supervisado</div>
+          <div class="card-subtitle">Relacion entre subtipo no supervisado y prediccion individual</div>
+        </div>
+      </div>
+
+      <div class="comparison-grid">
+        ${items.map(item => {
+          const clusterPct = clusters[item.key].cluster_risk_pct;
+          const modelPct = risks[item.key].pct;
+          const diff = Math.abs(modelPct - clusterPct);
+          const relation = diff <= 15 ? 'Relacion fuerte' : diff <= 30 ? 'Relacion parcial' : 'Diferencia alta';
+          return `
+            <div class="comparison-item">
+              <div class="result-condition">${item.label}</div>
+              <div class="comparison-values">
+                <span>Cluster ${clusterPct}%</span>
+                <span>Modelo ${modelPct}%</span>
+              </div>
+              <strong>${relation}</strong>
+              <p>Diferencia: ${diff} puntos porcentuales.</p>
+            </div>
+          `;
+        }).join('')}
       </div>
     </div>
   `;
@@ -308,17 +458,11 @@ function animateGauge(pct, level) {
   if (!circle || !display) return;
 
   const circumference = 314;
-  const color = gaugeColor(level);
-  circle.style.stroke = color;
-
-  const targetDashoffset = circumference - (circumference * pct / 100);
-
-  // Agregar transición
+  circle.style.stroke = gaugeColor(level);
   circle.style.transition = 'stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1)';
 
   setTimeout(() => {
-    circle.style.strokeDashoffset = targetDashoffset;
-    // Contador numérico
+    circle.style.strokeDashoffset = circumference - (circumference * pct / 100);
     animateCounter(display, 0, pct, 1400, '%');
   }, 150);
 }
@@ -336,14 +480,7 @@ function animateCounter(el, from, to, duration, suffix = '') {
 }
 
 function gaugeColor(level) {
-  return { low: '#00d4a0', moderate: '#ffb800', high: '#ff9f3f', critical: '#ff4757' }[level];
-}
-
-// ──────────────────────────────────────────────
-// UTILIDADES
-// ──────────────────────────────────────────────
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return { low: '#18a878', moderate: '#b7791f', high: '#b45309', critical: '#c2413a' }[level];
 }
 
 function escapeHTML(str) {
@@ -362,9 +499,8 @@ function setCurrentYear() {
   if (el) el.textContent = new Date().getFullYear();
 }
 
-// Delegación de eventos para "Nuevo análisis"
-document.addEventListener('click', (e) => {
-  if (e.target && e.target.id === 'new-analysis-btn') {
+document.addEventListener('click', (event) => {
+  if (event.target && event.target.id === 'new-analysis-btn') {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 });

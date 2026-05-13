@@ -1,45 +1,29 @@
-# Tu Salud — Frontend
+# Tu Salud - Frontend
 
-Interfaz web del sistema de análisis predictivo de riesgos médicos.
+Interfaz web para capturar las variables que esperan los modelos guardados en `models/`.
 
-## Estructura
+## Como usar
 
+1. Levanta el backend:
+
+```powershell
+uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
 ```
+
+2. Abre `App/index.html` en el navegador.
+
+El formulario primero envia los datos a `http://localhost:8000/cluster` para ubicar al paciente en los perfiles K-Means no supervisados. Despues llama a `http://localhost:8000/predict` y compara esos clusters contra las probabilidades supervisadas.
+
+## Archivos
+
+```text
 App/
-├── index.html        → Dashboard principal: formulario + resultados de riesgo
-├── about.html        → Descripción del proyecto, modelos y datasets
-├── css/
-│   └── styles.css    → Estilos globales (tema oscuro médico, responsivo)
-└── js/
-    └── app.js        → Lógica: lectura de formulario, simulación y renderizado
+  index.html      Formulario y resultados
+  about.html      Informacion del proyecto
+  css/styles.css  Estilos
+  js/app.js       Conexion con backend y render de resultados
 ```
-
-## Cómo usar
-
-Abrir `index.html` directamente en el navegador. No requiere servidor ni dependencias externas.
-
-## Conectar con backend Python
-
-En `js/app.js`, reemplazar la función `simulateRisks(data)` por una llamada al endpoint:
-
-```js
-async function getRisksFromModel(data) {
-  const response = await fetch('http://localhost:5000/predict', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-  return await response.json();
-  // Espera: { diabetes:{pct,level}, hipert:{pct,level}, cardio:{pct,level}, general:{pct,level} }
-}
-```
-
-## Tecnologías
-
-- HTML5, CSS3, JavaScript (vanilla)
-- Google Fonts: DM Sans + Space Mono
-- Sin frameworks ni dependencias externas
 
 ## Aviso
 
-Los resultados mostrados son simulaciones demostrativas y **no constituyen diagnóstico médico**.
+Las predicciones no constituyen diagnostico medico.

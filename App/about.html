@@ -3,24 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Acerca del Proyecto — Tu Salud</title>
-  <meta name="description" content="Descripción del proyecto académico Tu Salud: modelos, datasets y objetivos." />
+  <title>Acerca del Proyecto - Tu Salud</title>
+  <meta name="description" content="Arquitectura, modelos y estado actual del sistema Tu Salud." />
   <link rel="stylesheet" href="css/styles.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🩺</text></svg>" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>+</text></svg>" />
 </head>
 <body>
 
-  <!-- ─── NAVEGACIÓN ─── -->
   <nav class="nav">
     <div class="nav-inner">
       <a href="index.html" class="nav-logo">
-        <div class="nav-logo-icon">🩺</div>
+        <div class="nav-logo-icon">+</div>
         <span class="nav-logo-text">Tu <span>Salud</span></span>
       </a>
       <ul class="nav-links">
-        <li><a href="index.html">Análisis</a></li>
+        <li><a href="index.html">Analisis</a></li>
         <li><a href="about.html" class="active">Acerca del proyecto</a></li>
-        <li><span class="nav-badge">Demo Académico</span></li>
+        <li><span class="nav-badge">Demo Academico</span></li>
       </ul>
     </div>
   </nav>
@@ -28,236 +27,227 @@
   <div class="page-wrapper">
     <div class="container">
 
-      <!-- ─── HERO ─── -->
       <div class="page-hero">
-        <div class="page-hero-tag">Proyecto Académico · Ciencia de Datos</div>
+        <div class="page-hero-tag">Proyecto Academico - Machine Learning Medico</div>
         <h1>Acerca de<br><span class="accent">Tu Salud</span></h1>
-        <p>Un sistema de análisis predictivo de riesgos médicos construido con machine learning y datasets clínicos reales.</p>
+        <p>Sistema web que conecta una interfaz clinica con modelos entrenados para analizar perfiles K-Means y predicciones supervisadas de riesgo medico.</p>
       </div>
 
-      <!-- ─── QUÉ ES EL PROYECTO ─── -->
       <div class="about-full-card">
-        <h2>¿Qué es Tu Salud?</h2>
+        <h2>Que hace el proyecto</h2>
         <p>
-          <strong style="color:var(--text-primary)">Tu Salud</strong> es un proyecto académico de análisis predictivo de riesgos médicos desarrollado como parte de un ejercicio de ciencia de datos e ingeniería de software. Su objetivo es construir un sistema completo que, a partir de datos clínicos de un paciente, sea capaz de estimar el riesgo de padecer tres condiciones crónicas de alta prevalencia: <strong style="color:var(--text-primary)">diabetes, hipertensión arterial y paro cardíaco</strong>, además de una evaluación de riesgo general de salud.
+          <strong style="color:var(--text-primary)">Tu Salud</strong> permite capturar datos clinicos de un paciente y enviarlos a un backend local hecho con FastAPI. El backend carga modelos guardados con <strong style="color:var(--text-primary)">joblib</strong> desde la carpeta <strong style="color:var(--text-primary)">models/</strong> y devuelve resultados para diabetes, hipertension arterial, paro cardiaco y una evaluacion general.
         </p>
         <p style="margin-top:1rem">
-          El proyecto integra técnicas de <strong style="color:var(--text-primary)">aprendizaje automático supervisado y no supervisado</strong>, procesamiento de datos médicos reales y una interfaz web para presentar los resultados de forma accesible y clara.
+          El flujo actual usa primero el modelo no supervisado K-Means para ubicar al paciente dentro de grupos clinicos reales guardados en los metadatos. Despues ejecuta los modelos supervisados y compara si el grupo asignado tiene relacion con las probabilidades individuales.
         </p>
 
         <div class="disclaimer-banner" style="margin-top:1.5rem;margin-bottom:0">
-          <span class="icon">🔬</span>
+          <span class="icon">!</span>
           <p>
-            <strong>Esta versión del frontend es una simulación visual demostrativa.</strong> Los cálculos de riesgo mostrados son ilustrativos y están basados en heurísticas clínicas simplificadas. En la versión final, el frontend se conectará con los modelos predictivos de Python entrenados con los datasets reales del proyecto.
+            <strong>Aviso:</strong> los resultados son generados por modelos entrenados para fines academicos. No sustituyen una valoracion medica, no constituyen diagnostico y deben interpretarse solo como apoyo experimental.
           </p>
         </div>
       </div>
 
-      <!-- ─── GRID DE INFORMACIÓN ─── -->
       <div class="about-grid">
 
-        <!-- Condiciones analizadas -->
+        <div class="info-card">
+          <div class="info-card-tag">Flujo actual</div>
+          <h3>Como se ejecuta el analisis</h3>
+          <p>La app ya no usa una simulacion del frontend. El formulario envia los datos al backend y recibe respuestas de los modelos guardados.</p>
+          <div class="pipeline" style="margin-top:1rem">
+            <div class="pipeline-step">Formulario</div>
+            <div class="pipeline-arrow">-></div>
+            <div class="pipeline-step highlight">/cluster</div>
+            <div class="pipeline-arrow">-></div>
+            <div class="pipeline-step highlight">/predict</div>
+            <div class="pipeline-arrow">-></div>
+            <div class="pipeline-step">Reporte</div>
+          </div>
+        </div>
+
         <div class="info-card">
           <div class="info-card-tag">Riesgos analizados</div>
-          <h3>Condiciones médicas objetivo</h3>
-          <p>El sistema predice la probabilidad de riesgo individual para cuatro evaluaciones:</p>
+          <h3>Condiciones medicas objetivo</h3>
+          <p>El sistema entrega resultados separados y una evaluacion general ponderada.</p>
           <div class="condition-badges">
-            <span class="condition-pill general">⚠️ Riesgo general de salud</span>
-            <span class="condition-pill diabetes">🩸 Diabetes mellitus</span>
-            <span class="condition-pill hipert">❤️ Hipertensión arterial</span>
-            <span class="condition-pill cardio">⚡ Paro cardíaco</span>
+            <span class="condition-pill diabetes">Diabetes mellitus</span>
+            <span class="condition-pill hipert">Hipertension arterial</span>
+            <span class="condition-pill cardio">Paro cardiaco</span>
+            <span class="condition-pill general">Riesgo general</span>
           </div>
         </div>
 
-        <!-- Datos de entrada -->
         <div class="info-card">
-          <div class="info-card-tag">Variables clínicas</div>
-          <h3>¿Qué datos se ingresan?</h3>
-          <p>El modelo utiliza las siguientes variables como entrada:</p>
+          <div class="info-card-tag">No supervisado</div>
+          <h3>K-Means por enfermedad</h3>
+          <p>El modelo no supervisado se usa para asignar al paciente a un grupo clinico segun la cercania a los centroides aprendidos.</p>
           <ul class="info-list">
-            <li>Edad y sexo biológico</li>
-            <li>Glucosa en sangre (mg/dL)</li>
-            <li>Presión arterial sistólica (mmHg)</li>
-            <li>Índice de Masa Corporal (IMC)</li>
-            <li>Frecuencia cardíaca (bpm)</li>
-            <li>Colesterol total (mg/dL)</li>
-            <li>Tabaquismo y actividad física</li>
-            <li>Antecedentes familiares</li>
+            <li>Diabetes: 2 clusters, silhouette 0.196</li>
+            <li>Hipertension: 4 clusters, silhouette 0.299</li>
+            <li>Paro cardiaco: 5 clusters, silhouette 0.239</li>
+            <li>Se muestran solo datos reales: cluster asignado, distancia al centroide, n del grupo y riesgo promedio historico.</li>
           </ul>
+          <p style="margin-top:0.9rem;font-size:0.78rem;color:var(--text-muted);line-height:1.55">
+            Silhouette mide que tan separados estan los clusters: valores cercanos a 1 indican grupos muy definidos, valores cercanos a 0 indican grupos mezclados. En este proyecto se interpreta como referencia exploratoria, no como diagnostico.
+          </p>
         </div>
 
-        <!-- Modelos -->
         <div class="info-card">
-          <div class="info-card-tag">Machine Learning</div>
-          <h3>Tipos de modelos utilizados</h3>
-          <p>El proyecto emplea dos enfoques complementarios de aprendizaje automático:</p>
+          <div class="info-card-tag">Supervisado</div>
+          <h3>Modelos de prediccion</h3>
+          <p>El backend ejecuta clasificadores entrenados y devuelve porcentajes de riesgo por condicion.</p>
           <ul class="info-list">
-            <li><strong style="color:var(--text-primary)">No supervisado:</strong> Clustering para identificar perfiles de riesgo general sin etiquetas previas.</li>
-            <li><strong style="color:var(--text-primary)">Supervisado:</strong> Clasificadores entrenados para predecir diabetes, hipertensión y paro cardíaco.</li>
-          </ul>
-          <div class="tech-tags" style="margin-top:1rem">
-            <span class="tech-tag">Python</span>
-            <span class="tech-tag">scikit-learn</span>
-            <span class="tech-tag">pandas</span>
-            <span class="tech-tag">Jupyter</span>
-            <span class="tech-tag">DVC</span>
-          </div>
-        </div>
-
-        <!-- Datasets -->
-        <div class="info-card">
-          <div class="info-card-tag">Datos reales</div>
-          <h3>Datasets médicos utilizados</h3>
-          <p>El proyecto usa tres datasets clínicos reales gestionados con DVC:</p>
-          <ul class="info-list">
-            <li><span style="font-family:var(--font-mono);font-size:0.82rem;color:var(--blue-primary)">diabetes.csv</span> — Datos de pacientes con indicadores de diabetes.</li>
-            <li><span style="font-family:var(--font-mono);font-size:0.82rem;color:var(--red-risk)">Hipertension_Arterial_Mexico.csv</span> — Registros de presión arterial en México.</li>
-            <li><span style="font-family:var(--font-mono);font-size:0.82rem;color:var(--green-health)">Medicaldataset.csv</span> — Dataset médico general para riesgo cardíaco.</li>
+            <li>Diabetes usa variables tipo Pima: glucosa, presion diastolica, insulina, IMC, edad y antecedentes.</li>
+            <li>Hipertension usa biomarcadores, antropometria, presion, actividad y variables metabolicas.</li>
+            <li>Paro cardiaco usa edad, sexo, frecuencia cardiaca, presion, glucosa, CK-MB y troponina.</li>
           </ul>
         </div>
 
       </div>
 
-      <!-- ─── PIPELINE ─── -->
       <div class="card" style="margin-bottom:2.5rem">
         <div class="card-header">
-          <div class="card-header-icon blue">⚙️</div>
+          <div class="card-header-icon blue">API</div>
           <div>
-            <div class="card-title">Pipeline del Sistema</div>
-            <div class="card-subtitle">Flujo de datos desde la entrada hasta la predicción</div>
+            <div class="card-title">Arquitectura del sistema</div>
+            <div class="card-subtitle">Frontend estatico, backend FastAPI y modelos joblib</div>
           </div>
         </div>
 
         <p style="font-size:0.86rem;color:var(--text-secondary);margin-bottom:1.5rem">
-          El sistema sigue un pipeline completo que comienza con la captura de datos clínicos del paciente y termina en una evaluación visual de riesgo generada por los modelos de machine learning.
+          La aplicacion funciona como una integracion local. El usuario abre el frontend en <span class="text-mono">App/index.html</span>, levanta el backend con Uvicorn y el navegador consume los endpoints en <span class="text-mono">http://localhost:8000</span>.
         </p>
 
-        <div class="pipeline">
-          <div class="pipeline-step">📋<br/>Captura de datos clínicos</div>
-          <div class="pipeline-arrow">→</div>
-          <div class="pipeline-step highlight">⚙️<br/>Preprocesamiento</div>
-          <div class="pipeline-arrow">→</div>
-          <div class="pipeline-step highlight">🤖<br/>Modelos ML</div>
-          <div class="pipeline-arrow">→</div>
-          <div class="pipeline-step">📊<br/>Predicciones</div>
-          <div class="pipeline-arrow">→</div>
-          <div class="pipeline-step">🖥️<br/>Visualización</div>
-        </div>
-
-        <div style="margin-top:1.5rem">
-          <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.8rem">
-            Estructura de carpetas del proyecto
+        <div class="about-grid" style="margin-bottom:0">
+          <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.2rem">
+            <div class="info-card-tag">Backend</div>
+            <h3>Endpoints disponibles</h3>
+            <ul class="info-list">
+              <li><span class="text-mono">GET /health</span>: confirma que la API esta activa.</li>
+              <li><span class="text-mono">POST /cluster</span>: ejecuta K-Means y devuelve grupo asignado por enfermedad.</li>
+              <li><span class="text-mono">POST /predict</span>: ejecuta modelos supervisados y devuelve porcentajes de riesgo.</li>
+            </ul>
           </div>
-          <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-family:var(--font-mono);font-size:0.78rem;color:var(--text-secondary);line-height:1.9">
-            <span style="color:var(--blue-primary)">Tu-salud/</span><br/>
-            ├── <span style="color:var(--green-health)">App/</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--text-muted)"># Frontend (aquí estás)</span><br/>
-            ├── <span style="color:var(--text-secondary)">Base-de-datos/</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--text-muted)"># Datasets médicos</span><br/>
-            ├── <span style="color:var(--amber)">No-supervisado/</span> &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--text-muted)"># Modelo de clustering</span><br/>
-            ├── <span style="color:var(--amber)">Supervisado/</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--text-muted)"># Clasificadores por condición</span><br/>
-            ├── <span style="color:var(--text-muted)">README.MD</span><br/>
-            └── <span style="color:var(--text-muted)">Base-de-datos.dvc</span>
+
+          <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.2rem">
+            <div class="info-card-tag">Frontend</div>
+            <h3>Interfaz de analisis</h3>
+            <ul class="info-list">
+              <li>Formulario con los campos que esperan los modelos reales.</li>
+              <li>Resumen K-Means antes de la prediccion supervisada.</li>
+              <li>Comparacion entre riesgo promedio del grupo y prediccion individual.</li>
+              <li>Diseno visual actualizado a estilo de software medico.</li>
+            </ul>
           </div>
         </div>
       </div>
 
-      <!-- ─── ARQUITECTURA ML ─── -->
+      <div class="card" style="margin-bottom:2.5rem">
+        <div class="card-header">
+          <div class="card-header-icon green">DIR</div>
+          <div>
+            <div class="card-title">Que contiene cada carpeta</div>
+            <div class="card-subtitle">Resumen de la estructura actual del repositorio</div>
+          </div>
+        </div>
+
+        <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-family:var(--font-mono);font-size:0.78rem;color:var(--text-secondary);line-height:1.9">
+          <span style="color:var(--blue-primary)">Tu-salud/</span><br/>
+          |-- <span style="color:var(--green-health)">App/</span> <span style="color:var(--text-muted)">Frontend: formulario, resultados, about, estilos y JS.</span><br/>
+          |-- <span style="color:var(--blue-primary)">backend/</span> <span style="color:var(--text-muted)">API FastAPI que carga modelos y responde /cluster y /predict.</span><br/>
+          |-- <span style="color:var(--amber)">models/</span> <span style="color:var(--text-muted)">Modelos joblib, scalers, metadatos y resumen de clusters.</span><br/>
+          |-- <span style="color:var(--amber)">No-supervisado/</span> <span style="color:var(--text-muted)">Notebook de K-Means para perfiles de pacientes.</span><br/>
+          |-- <span style="color:var(--amber)">Supervisado/</span> <span style="color:var(--text-muted)">Notebooks de diabetes, hipertension y paro cardiaco.</span><br/>
+          |-- <span style="color:var(--text-muted)">Base-de-datos.dvc</span> <span style="color:var(--text-muted)">Referencia DVC para datasets originales.</span><br/>
+          |-- <span style="color:var(--text-muted)">requirements.txt</span> <span style="color:var(--text-muted)">Dependencias Python del backend y modelos.</span>
+        </div>
+      </div>
+
       <div class="about-grid" style="margin-bottom:2.5rem">
 
         <div class="info-card">
-          <div class="info-card-tag">Aprendizaje No Supervisado</div>
-          <h3>Identificación de perfiles de riesgo</h3>
-          <p>
-            Se utiliza un modelo de <strong style="color:var(--text-primary)">clustering</strong> (como K-Means o DBSCAN) para agrupar pacientes con características similares sin necesidad de etiquetas previas. Esto permite identificar automáticamente perfiles de riesgo general y descubrir patrones ocultos en los datos clínicos.
-          </p>
-          <ul class="info-list" style="margin-top:0.8rem">
-            <li>Segmentación automática de pacientes</li>
-            <li>Detección de anomalías clínicas</li>
-            <li>Perfil de riesgo sin etiquetas</li>
+          <div class="info-card-tag">Artefactos</div>
+          <h3>Modelos guardados</h3>
+          <p>La carpeta <span class="text-mono">models/</span> concentra los archivos usados en produccion local:</p>
+          <ul class="info-list">
+            <li><span class="text-mono">diabetes_model.joblib</span> y <span class="text-mono">diabetes_metadata.json</span></li>
+            <li><span class="text-mono">hipertension_model.joblib</span>, scaler y metadata</li>
+            <li><span class="text-mono">paro_cardiaco_model.joblib</span>, scaler y metadata</li>
+            <li><span class="text-mono">subtipos_kmeans.joblib</span> y <span class="text-mono">subtipos_metadata.json</span></li>
           </ul>
         </div>
 
         <div class="info-card">
-          <div class="info-card-tag">Aprendizaje Supervisado</div>
-          <h3>Predicción de condiciones específicas</h3>
-          <p>
-            Se entrenan <strong style="color:var(--text-primary)">clasificadores binarios</strong> específicos para cada condición usando los datasets etiquetados. Los modelos aprenden a distinguir entre pacientes con y sin riesgo para cada enfermedad objetivo.
-          </p>
-          <ul class="info-list" style="margin-top:0.8rem">
-            <li>Predicción de diabetes</li>
-            <li>Predicción de hipertensión arterial</li>
-            <li>Predicción de paro cardíaco</li>
-            <li>Validación cruzada y métricas (AUC, F1)</li>
+          <div class="info-card-tag">Datos de entrada</div>
+          <h3>Variables solicitadas</h3>
+          <p>El formulario pide campos compartidos y especificos para que todos los modelos puedan funcionar.</p>
+          <ul class="info-list">
+            <li>Datos generales: edad, sexo, IMC, glucosa y presion arterial.</li>
+            <li>Diabetes: embarazos, pliegue cutaneo, insulina y funcion pedigree.</li>
+            <li>Cardiaco: frecuencia cardiaca, glucosa, CK-MB y troponina.</li>
+            <li>Hipertension: biomarcadores, colesterol, antropometria, sueno y actividad.</li>
           </ul>
         </div>
 
       </div>
 
-      <!-- ─── ESTADO DEL PROYECTO ─── -->
       <div class="card" style="margin-bottom:2.5rem">
         <div class="card-header">
-          <div class="card-header-icon amber">📌</div>
+          <div class="card-header-icon amber">OK</div>
           <div>
-            <div class="card-title">Estado Actual del Frontend</div>
-            <div class="card-subtitle">Lo que es real y lo que es simulación</div>
+            <div class="card-title">Estado actual</div>
+            <div class="card-subtitle">Que esta funcionando en esta version</div>
           </div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem">
-
-          <div style="background:rgba(0,212,160,0.06);border:1px solid rgba(0,212,160,0.15);border-radius:var(--radius-md);padding:1.2rem">
+          <div style="background:var(--green-glow);border:1px solid rgba(24,168,120,0.22);border-radius:var(--radius-md);padding:1.2rem">
             <div style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--green-health);margin-bottom:0.8rem">
-              ✅ Implementado
+              Implementado
             </div>
             <ul class="info-list">
-              <li>Interfaz completa de captura de datos</li>
-              <li>Visualización de resultados de riesgo</li>
-              <li>Indicadores de barra y gauge circular</li>
-              <li>Diseño responsivo y accesible</li>
-              <li>Arquitectura lista para conectar backend</li>
+              <li>Backend conectado a modelos joblib.</li>
+              <li>Endpoint K-Means no supervisado.</li>
+              <li>Endpoint de predicciones supervisadas.</li>
+              <li>Frontend con datos requeridos por los modelos.</li>
+              <li>Comparacion cluster vs prediccion individual.</li>
             </ul>
           </div>
 
-          <div style="background:rgba(255,184,0,0.06);border:1px solid rgba(255,184,0,0.15);border-radius:var(--radius-md);padding:1.2rem">
+          <div style="background:var(--amber-glow);border:1px solid rgba(183,121,31,0.22);border-radius:var(--radius-md);padding:1.2rem">
             <div style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--amber);margin-bottom:0.8rem">
-              🔧 Pendiente (próxima fase)
+              Consideraciones
             </div>
             <ul class="info-list">
-              <li>Conexión con API del backend Python</li>
-              <li>Inferencia real con modelos entrenados</li>
-              <li>Historial de análisis por paciente</li>
-              <li>Exportación de reportes en PDF</li>
+              <li>Los clusters muestran datos reales guardados: n, riesgo promedio y distancia al centroide.</li>
+              <li>No se dibujan nubes de pacientes porque el joblib no guarda los puntos originales.</li>
+              <li>Para graficas PCA reales se tendrian que guardar coordenadas o muestras del entrenamiento.</li>
+              <li>La API debe estar encendida para que el frontend genere resultados.</li>
             </ul>
           </div>
-
-        </div>
-
-        <div style="margin-top:1.5rem;padding-top:1.2rem;border-top:1px solid var(--border)">
-          <p style="font-size:0.84rem;color:var(--text-secondary);line-height:1.7">
-            Para conectar el frontend con los modelos Python, se puede exponer una API REST (por ejemplo con <strong style="color:var(--text-primary)">Flask</strong> o <strong style="color:var(--text-primary)">FastAPI</strong>) que reciba los datos del formulario como JSON y devuelva las probabilidades de riesgo predichas. El archivo <code style="font-family:var(--font-mono);font-size:0.8rem;background:var(--bg-input);padding:2px 6px;border-radius:4px">js/app.js</code> ya está diseñado con la función <code style="font-family:var(--font-mono);font-size:0.8rem;background:var(--bg-input);padding:2px 6px;border-radius:4px">simulateRisks()</code> separada para ser reemplazada fácilmente por una llamada <code style="font-family:var(--font-mono);font-size:0.8rem;background:var(--bg-input);padding:2px 6px;border-radius:4px">fetch()</code> al backend.
-          </p>
         </div>
       </div>
 
-      <!-- ─── CTA ─── -->
       <div style="text-align:center;padding:2rem 0">
         <a href="index.html" class="btn btn-primary btn-lg">
-          <span class="btn-icon">🔬</span>
-          Probar el análisis demostrativo
+          <span class="btn-icon">ML</span>
+          Ir al analisis
         </a>
       </div>
 
-    </div><!-- /container -->
+    </div>
 
-    <!-- ─── FOOTER ─── -->
     <footer class="footer">
       <p class="footer-text">
-        <strong>Tu Salud</strong> — Proyecto académico de análisis predictivo de riesgos médicos.<br />
-        Los resultados son simulaciones visuales. No constituyen diagnóstico médico.<br />
-        <span style="color:var(--text-muted)">© <span id="current-year"></span> · Desarrollado con fines educativos</span>
+        <strong>Tu Salud</strong> - Proyecto academico de analisis predictivo de riesgos medicos.<br />
+        Resultados experimentales. No constituyen diagnostico medico.<br />
+        <span style="color:var(--text-muted)">&copy; <span id="current-year"></span> - Desarrollado con fines educativos</span>
       </p>
     </footer>
 
-  </div><!-- /page-wrapper -->
+  </div>
 
   <script>
     document.getElementById('current-year').textContent = new Date().getFullYear();
