@@ -157,7 +157,7 @@ function renderUnsupervisedAnalysis(data, clusters) {
           <div class="card-header-icon blue">ML</div>
           <div>
             <div class="card-title">Ejecutando modelos supervisados...</div>
-            <div class="card-subtitle">Comparando los clusters con las probabilidades individuales</div>
+            <div class="card-subtitle">Comparando perfiles exploratorios con las probabilidades individuales</div>
           </div>
         </div>
       </div>
@@ -176,7 +176,7 @@ function renderResults(data, risks, clusters) {
   requestAnimationFrame(() => {
     setTimeout(() => {
       container.querySelectorAll('.result-bar-fill').forEach(bar => {
-        bar.style.width = `${bar.dataset.width}%`;
+        bar.style.width = `${clampPercent(Number(bar.dataset.width))}%`;
       });
     }, 100);
   });
@@ -272,8 +272,8 @@ function buildClusterHTML(clusters, risks) {
       <div class="card-header">
         <div class="card-header-icon green">KM</div>
         <div>
-          <div class="card-title">Modelo no supervisado: grupos K-Means</div>
-          <div class="card-subtitle">Primero se ubica al paciente dentro del grupo mas parecido a sus datos</div>
+          <div class="card-title">Modelo no supervisado: perfiles K-Means</div>
+          <div class="card-subtitle">Primero se ubica al paciente dentro del perfil mas parecido a sus datos</div>
         </div>
       </div>
 
@@ -283,10 +283,10 @@ function buildClusterHTML(clusters, risks) {
 
       <div class="cluster-summary">
         <div>
-          <span class="stat-label">Riesgo general por clusters</span>
-          <strong>${clusters.general.cluster_risk_pct}%</strong>
+          <span class="stat-label">Referencia general por perfiles</span>
+          <strong>${formatPercent(clusters.general.profile_reference_pct ?? clusters.general.cluster_risk_pct)}</strong>
         </div>
-        <p>El grupo marcado es el cluster al que perteneces segun K-Means. El porcentaje del grupo viene del comportamiento historico de pacientes parecidos.</p>
+        <p>El perfil marcado indica similitud estadistica. El porcentaje es una referencia descriptiva posterior, no un diagnostico ni una etiqueta de enfermedad.</p>
       </div>
     </div>
   `;
@@ -294,7 +294,8 @@ function buildClusterHTML(clusters, risks) {
 
 function buildClusterMap(row, item, risk) {
   const patientGroup = getPatientGroup(item);
-  const relationHTML = risk ? buildMiniRelation(item.cluster_risk_pct, risk.pct) : '';
+  const profilePct = item.profile_reference_pct ?? item.cluster_risk_pct;
+  const relationHTML = risk ? buildMiniRelation(profilePct, risk.pct) : '';
   const maxN = Math.max(...item.groups.map(group => group.n));
 
   return `
@@ -304,7 +305,7 @@ function buildClusterMap(row, item, risk) {
           <strong>${row.label}</strong>
           <span>${item.group_label}</span>
         </div>
-        <span class="cluster-pill ${item.level}">Grupo ${item.cluster}</span>
+        <span class="cluster-pill ${item.level}">Perfil ${item.cluster}</span>
       </div>
 
       <div class="cluster-real-summary" style="--cluster-color:${row.color}">
@@ -313,9 +314,9 @@ function buildClusterMap(row, item, risk) {
             <span>${item.cluster}</span>
           </div>
           <div>
-            <span class="result-condition">Grupo asignado por K-Means</span>
+            <span class="result-condition">Perfil asignado por K-Means</span>
             <strong>${item.group_label}</strong>
-            <p>El modelo asigno este grupo usando la distancia real del paciente al centroide entrenado.</p>
+            <p>El modelo asigno este perfil usando la distancia real del paciente al centroide entrenado.</p>
           </div>
         </div>
 
@@ -327,8 +328,8 @@ function buildClusterMap(row, item, risk) {
               </div>
               <div class="cluster-group-body">
                 <div class="cluster-group-title">
-                  <strong>${group.is_patient_group ? item.group_label : `Cluster ${group.cluster}`}</strong>
-                  <span>${group.is_patient_group ? 'Paciente pertenece aqui' : 'Grupo disponible'}</span>
+                  <strong>${group.is_patient_group ? item.group_label : `Perfil ${group.cluster}`}</strong>
+                  <span>${group.is_patient_group ? 'Paciente pertenece aqui' : 'Perfil disponible'}</span>
                 </div>
                 <div class="cluster-group-meter">
                   <div style="width:${Math.max(8, (group.n / maxN) * 100)}%;background:${group.is_patient_group ? row.color : 'rgba(20,96,112,0.28)'}"></div>
@@ -336,7 +337,7 @@ function buildClusterMap(row, item, risk) {
               </div>
               <div class="cluster-group-values">
                 <span>n=${group.n}</span>
-                <strong>${group.cluster_risk_pct}%</strong>
+                <strong>${formatPercent(group.profile_reference_pct ?? group.cluster_risk_pct)}</strong>
               </div>
             </div>
           `).join('')}
@@ -345,12 +346,12 @@ function buildClusterMap(row, item, risk) {
 
       <div class="cluster-map-stats">
         <div>
-          <span>Grupo asignado</span>
+          <span>Perfil asignado</span>
           <strong>${item.group_label}</strong>
         </div>
         <div>
-          <span>Riesgo del grupo</span>
-          <strong>${item.cluster_risk_pct}%</strong>
+          <span>Referencia del perfil</span>
+          <strong>${formatPercent(profilePct)}</strong>
         </div>
         <div>
           <span>Pacientes similares</span>
@@ -365,15 +366,15 @@ function buildClusterMap(row, item, risk) {
       <div class="cluster-affinity">
         <div class="cluster-affinity-label">
           <span>Afinidad al centroide</span>
-          <strong>${patientGroup.affinity_pct}%</strong>
+          <strong>${formatPercent(patientGroup.affinity_pct)}</strong>
         </div>
         <div class="cluster-affinity-track">
-          <div style="width:${patientGroup.affinity_pct}%;background:${row.color}"></div>
+          <div style="width:${clampPercent(patientGroup.affinity_pct)}%;background:${row.color}"></div>
         </div>
       </div>
 
       ${relationHTML}
-      <p class="cluster-footnote">k=${item.k} · silhouette ${item.silhouette} · distancia ${item.distance_to_center}</p>
+      <p class="cluster-footnote">k=${item.k} ? silhouette ${item.silhouette} ? distancia ${item.distance_to_center} ? exploratorio</p>
     </section>
   `;
 }
@@ -387,8 +388,8 @@ function buildMiniRelation(clusterPct, modelPct) {
   const relation = diff <= 15 ? 'Relacion fuerte' : diff <= 30 ? 'Relacion parcial' : 'Diferencia alta';
   return `
     <div class="cluster-relation">
-      <span>Cluster ${clusterPct}%</span>
-      <span>Supervisado ${modelPct}%</span>
+      <span>Perfil ${formatPercent(clusterPct)}</span>
+      <span>Supervisado ${formatPercent(modelPct)}</span>
       <strong>${relation}</strong>
     </div>
   `;
@@ -406,14 +407,14 @@ function buildClusterComparisonHTML(clusters, risks) {
       <div class="card-header">
         <div class="card-header-icon amber">CMP</div>
         <div>
-          <div class="card-title">Comparacion cluster vs modelo supervisado</div>
-          <div class="card-subtitle">Relacion entre subtipo no supervisado y prediccion individual</div>
+          <div class="card-title">Comparacion perfil vs modelo supervisado</div>
+          <div class="card-subtitle">Referencia exploratoria contra prediccion individual</div>
         </div>
       </div>
 
       <div class="comparison-grid">
         ${items.map(item => {
-          const clusterPct = clusters[item.key].cluster_risk_pct;
+          const clusterPct = clusters[item.key].profile_reference_pct ?? clusters[item.key].cluster_risk_pct;
           const modelPct = risks[item.key].pct;
           const diff = Math.abs(modelPct - clusterPct);
           const relation = diff <= 15 ? 'Relacion fuerte' : diff <= 30 ? 'Relacion parcial' : 'Diferencia alta';
@@ -421,11 +422,11 @@ function buildClusterComparisonHTML(clusters, risks) {
             <div class="comparison-item">
               <div class="result-condition">${item.label}</div>
               <div class="comparison-values">
-                <span>Cluster ${clusterPct}%</span>
-                <span>Modelo ${modelPct}%</span>
+                <span>Perfil ${formatPercent(clusterPct)}</span>
+                <span>Modelo ${formatPercent(modelPct)}</span>
               </div>
               <strong>${relation}</strong>
-              <p>Diferencia: ${diff} puntos porcentuales.</p>
+              <p>Diferencia descriptiva: ${formatPercent(diff).replace('%', '')} puntos porcentuales.</p>
             </div>
           `;
         }).join('')}
@@ -442,7 +443,7 @@ function buildConditionCard(condition, risk) {
         <span class="result-condition">${condition.icon} ${condition.label}</span>
         <span class="result-badge ${info.badge}">${info.label}</span>
       </div>
-      <div class="result-percentage">${risk.pct}%</div>
+      <div class="result-percentage">${formatPercent(risk.pct)}</div>
       <div class="result-label">Probabilidad de riesgo</div>
       <div class="result-bar-bg">
         <div class="result-bar-fill" data-width="${risk.pct}" style="width:0%"></div>
@@ -462,7 +463,7 @@ function animateGauge(pct, level) {
   circle.style.transition = 'stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1)';
 
   setTimeout(() => {
-    circle.style.strokeDashoffset = circumference - (circumference * pct / 100);
+    circle.style.strokeDashoffset = circumference - (circumference * clampPercent(pct) / 100);
     animateCounter(display, 0, pct, 1400, '%');
   }, 150);
 }
@@ -473,7 +474,7 @@ function animateCounter(el, from, to, duration, suffix = '') {
     const elapsed = now - start;
     const progress = Math.min(elapsed / duration, 1);
     const eased = 1 - Math.pow(1 - progress, 3);
-    el.textContent = Math.round(from + (to - from) * eased) + suffix;
+    el.textContent = formatPercent(from + (to - from) * eased);
     if (progress < 1) requestAnimationFrame(update);
   };
   requestAnimationFrame(update);
@@ -481,6 +482,14 @@ function animateCounter(el, from, to, duration, suffix = '') {
 
 function gaugeColor(level) {
   return { low: '#18a878', moderate: '#b7791f', high: '#b45309', critical: '#c2413a' }[level];
+}
+
+function clampPercent(value) {
+  return Math.max(0, Math.min(100, Number(value) || 0));
+}
+
+function formatPercent(value) {
+  return `${clampPercent(value).toFixed(2)}%`;
 }
 
 function escapeHTML(str) {

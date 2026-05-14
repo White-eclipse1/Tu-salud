@@ -62,7 +62,7 @@ def predict(data: dict[str, Any]) -> dict[str, Any]:
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Error al predecir: {exc}") from exc
 
-    general_pct = round(diabetes["pct"] * 0.3 + hipert["pct"] * 0.35 + cardio["pct"] * 0.35)
+    general_pct = clamp_percent(diabetes["pct"] * 0.3 + hipert["pct"] * 0.35 + cardio["pct"] * 0.35)
     return {
         "diabetes": diabetes,
         "hipert": hipert,
@@ -97,19 +97,22 @@ def cluster(data: dict[str, Any]) -> dict[str, Any]:
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Error al calcular clusters: {exc}") from exc
 
-    cluster_mean = round(
-        diabetes["proba_media_modelo"] * 0.3
-        + hipert["proba_media_modelo"] * 0.35
-        + cardio["proba_media_modelo"] * 0.35,
-        3,
+    profile_reference_pct = clamp_percent(
+        (
+            diabetes["proba_media_supervisado_referencia"] * 0.3
+            + hipert["proba_media_supervisado_referencia"] * 0.35
+            + cardio["proba_media_supervisado_referencia"] * 0.35
+        )
+        * 100
     )
     return {
         "diabetes": diabetes,
         "hipert": hipert,
         "cardio": cardio,
         "general": {
-            "cluster_risk_pct": round(cluster_mean * 100),
-            "level": classify(round(cluster_mean * 100)),
+            "profile_reference_pct": profile_reference_pct,
+            "cluster_risk_pct": profile_reference_pct,
+            "level": classify(profile_reference_pct),
         },
     }
 
@@ -184,6 +187,7 @@ def predict_hipertension(bundle: dict[str, Any], data: dict[str, Any]) -> dict[s
     features["valor_colesterol_total"] = number(data, "cholesterol_total")
     features["tension_arterial"] = number(data, "bp_systolic")
     features["masa_corporal"] = number(data, "bmi")
+    normalize_height_units(features)
 
     missing = [key for key, value in features.items() if value is None or not math.isfinite(value)]
     if missing:
@@ -194,6 +198,7 @@ def predict_hipertension(bundle: dict[str, Any], data: dict[str, Any]) -> dict[s
     if scaler is not None:
         frame = pd.DataFrame(scaler.transform(frame), columns=metadata["feature_columns"])
     probability = probability_for(bundle["model"], frame)
+    probability = apply_probability_bounds(probability, metadata)
     return format_risk(probability)
 
 
@@ -210,6 +215,7 @@ def build_hipertension_features(data: dict[str, Any]) -> pd.DataFrame:
     features["valor_colesterol_total"] = number(data, "cholesterol_total")
     features["tension_arterial"] = number(data, "bp_systolic")
     features["masa_corporal"] = number(data, "bmi")
+    normalize_height_units(features)
 
     missing = [key for key, value in features.items() if value is None or not math.isfinite(value)]
     if missing:
@@ -275,17 +281,21 @@ def predict_cluster(
     for row in metadata["summary_per_cluster"][disease]:
         group_cluster = int(row["cluster"])
         distance = float(distances[group_cluster])
-        risk_pct = round(float(row["proba_media_modelo"]) * 100)
+        reference_probability = cluster_reference_probability(row)
+        reference_pct = clamp_percent(reference_probability * 100)
         groups.append(
             {
                 "cluster": group_cluster,
                 "n": int(row["n"]),
-                "pct_positivos": float(row["pct_positivos"]),
-                "proba_media_modelo": float(row["proba_media_modelo"]),
-                "cluster_risk_pct": risk_pct,
-                "level": classify(risk_pct),
+                "pct_muestra": float(row.get("pct_muestra", 0.0)),
+                "tasa_positivos_referencia": float(row.get("tasa_positivos_referencia", row.get("pct_positivos", 0.0))),
+                "proba_media_supervisado_referencia": reference_probability,
+                "proba_media_modelo": reference_probability,
+                "profile_reference_pct": reference_pct,
+                "cluster_risk_pct": reference_pct,
+                "level": classify(reference_pct),
                 "distance_to_center": round(distance, 3),
-                "affinity_pct": max(0, min(100, round((1 - distance / max_distance) * 100))),
+                "affinity_pct": clamp_percent((1 - distance / max_distance) * 100),
                 "is_patient_group": group_cluster == cluster_id,
             }
         )
@@ -295,10 +305,13 @@ def predict_cluster(
         "k": int(artifact["k"]),
         "silhouette": round(float(artifact["silhouette"]), 3),
         "n": int(summary["n"]),
-        "pct_positivos": float(summary["pct_positivos"]),
-        "proba_media_modelo": float(summary["proba_media_modelo"]),
-        "cluster_risk_pct": round(float(summary["proba_media_modelo"]) * 100),
-        "level": classify(round(float(summary["proba_media_modelo"]) * 100)),
+        "pct_muestra": float(summary.get("pct_muestra", 0.0)),
+        "tasa_positivos_referencia": float(summary.get("tasa_positivos_referencia", summary.get("pct_positivos", 0.0))),
+        "proba_media_supervisado_referencia": cluster_reference_probability(summary),
+        "proba_media_modelo": cluster_reference_probability(summary),
+        "profile_reference_pct": clamp_percent(cluster_reference_probability(summary) * 100),
+        "cluster_risk_pct": clamp_percent(cluster_reference_probability(summary) * 100),
+        "level": classify(clamp_percent(cluster_reference_probability(summary) * 100)),
         "distance_to_center": round(assigned_distance, 3),
         "group_label": cluster_group_label(disease, cluster_id),
         "groups": groups,
@@ -320,6 +333,16 @@ def probability_for(model: Any, frame: Any) -> float:
             return float(probabilities[0])
         prediction = model.predict(frame)[0]
         return float(prediction)
+
+
+def apply_probability_bounds(probability: float, metadata: dict[str, Any]) -> float:
+    lower = metadata.get("probability_lower_bound")
+    upper = metadata.get("probability_upper_bound")
+    if lower is not None:
+        probability = max(float(lower), probability)
+    if upper is not None:
+        probability = min(float(upper), probability)
+    return probability
 
 
 def number(data: dict[str, Any], key: str, default: float | None = None) -> float:
@@ -350,6 +373,18 @@ def optional_number(data: dict[str, Any], key: str) -> float | None:
     return parsed
 
 
+def normalize_height_units(features: dict[str, float | None]) -> None:
+    for key in ("estatura", "segundamedicion_estatura"):
+        value = features.get(key)
+        if value is not None and math.isfinite(value) and 0 < value < 3:
+            features[key] = value * 100
+
+
+def cluster_reference_probability(row: dict[str, Any]) -> float:
+    value = row.get("proba_media_supervisado_referencia", row.get("proba_media_modelo", 0.0))
+    return float(value)
+
+
 def hypertension_sex_code(data: dict[str, Any]) -> float:
     value = str(data.get("sex", "")).strip().upper()
     if value in {"1", "M", "MASCULINO", "HOMBRE"}:
@@ -378,11 +413,15 @@ def bucket_label(value: float, bins: list[float], labels: list[str]) -> str | No
 
 
 def format_risk(probability: float) -> dict[str, Any]:
-    pct = max(0, min(100, round(probability * 100)))
+    pct = clamp_percent(probability * 100)
     return {"pct": pct, "level": classify(pct)}
 
 
-def classify(pct: int) -> str:
+def clamp_percent(value: float) -> float:
+    return max(0.0, min(100.0, float(value)))
+
+
+def classify(pct: float) -> str:
     if pct >= 70:
         return "critical"
     if pct >= 45:
@@ -395,21 +434,21 @@ def classify(pct: int) -> str:
 def cluster_group_label(disease: str, cluster_id: int) -> str:
     labels = {
         "diabetes": {
-            0: "Grupo metabolico alto",
-            1: "Grupo metabolico bajo",
+            0: "Perfil metabolico A",
+            1: "Perfil metabolico B",
         },
         "hipertension": {
-            0: "Grupo hipertensivo frecuente",
-            1: "Grupo cardiovascular bajo",
-            2: "Grupo hipertensivo metabolico",
-            3: "Grupo hipertensivo avanzado",
+            0: "Perfil antropometrico A",
+            1: "Perfil cardiovascular B",
+            2: "Perfil metabolico C",
+            3: "Perfil actividad D",
         },
         "paro_cardiaco": {
-            0: "Grupo cardiaco intermedio",
-            1: "Grupo cardiaco atipico",
-            2: "Grupo cardiometabolico comun",
-            3: "Grupo cardiaco critico",
-            4: "Grupo cardiaco muy alto",
+            0: "Perfil cardiaco A",
+            1: "Perfil biomarcadores B",
+            2: "Perfil cardiometabolico C",
+            3: "Perfil presion D",
+            4: "Perfil biomarcadores E",
         },
     }
     return labels.get(disease, {}).get(cluster_id, f"Grupo {cluster_id}")

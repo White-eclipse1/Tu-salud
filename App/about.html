@@ -81,13 +81,13 @@
 
         <div class="info-card">
           <div class="info-card-tag">No supervisado</div>
-          <h3>K-Means por enfermedad</h3>
+          <h3>K-Means exploratorio</h3>
           <p>El modelo no supervisado se usa para asignar al paciente a un grupo clinico segun la cercania a los centroides aprendidos.</p>
           <ul class="info-list">
             <li>Diabetes: 2 clusters, silhouette 0.196</li>
-            <li>Hipertension: 4 clusters, silhouette 0.299</li>
-            <li>Paro cardiaco: 5 clusters, silhouette 0.239</li>
-            <li>Se muestran solo datos reales: cluster asignado, distancia al centroide, n del grupo y riesgo promedio historico.</li>
+            <li>Hipertension: perfiles K-Means exploratorios, silhouette aprox. 0.301</li>
+            <li>Paro cardiaco: perfiles K-Means exploratorios, silhouette aprox. 0.225</li>
+            <li>Se muestran datos descriptivos: perfil asignado, distancia al centroide, n del grupo y referencia posterior del modelo supervisado.</li>
           </ul>
           <p style="margin-top:0.9rem;font-size:0.78rem;color:var(--text-muted);line-height:1.55">
             Silhouette mide que tan separados estan los clusters: valores cercanos a 1 indican grupos muy definidos, valores cercanos a 0 indican grupos mezclados. En este proyecto se interpreta como referencia exploratoria, no como diagnostico.
@@ -126,7 +126,7 @@
             <h3>Endpoints disponibles</h3>
             <ul class="info-list">
               <li><span class="text-mono">GET /health</span>: confirma que la API esta activa.</li>
-              <li><span class="text-mono">POST /cluster</span>: ejecuta K-Means y devuelve grupo asignado por enfermedad.</li>
+              <li><span class="text-mono">POST /cluster</span>: ejecuta K-Means y devuelve el perfil exploratorio asignado por dataset.</li>
               <li><span class="text-mono">POST /predict</span>: ejecuta modelos supervisados y devuelve porcentajes de riesgo.</li>
             </ul>
           </div>
@@ -137,7 +137,7 @@
             <ul class="info-list">
               <li>Formulario con los campos que esperan los modelos reales.</li>
               <li>Resumen K-Means antes de la prediccion supervisada.</li>
-              <li>Comparacion entre riesgo promedio del grupo y prediccion individual.</li>
+              <li>Comparacion entre referencia del perfil y prediccion individual.</li>
               <li>Diseno visual actualizado a estilo de software medico.</li>
             </ul>
           </div>
@@ -212,7 +212,7 @@
               <li>Endpoint K-Means no supervisado.</li>
               <li>Endpoint de predicciones supervisadas.</li>
               <li>Frontend con datos requeridos por los modelos.</li>
-              <li>Comparacion cluster vs prediccion individual.</li>
+              <li>Comparacion perfil exploratorio vs prediccion individual.</li>
             </ul>
           </div>
 
@@ -221,7 +221,7 @@
               Consideraciones
             </div>
             <ul class="info-list">
-              <li>Los clusters muestran datos reales guardados: n, riesgo promedio y distancia al centroide.</li>
+              <li>Los perfiles muestran datos guardados: n, referencia descriptiva y distancia al centroide.</li>
               <li>No se dibujan nubes de pacientes porque el joblib no guarda los puntos originales.</li>
               <li>Para graficas PCA reales se tendrian que guardar coordenadas o muestras del entrenamiento.</li>
               <li>La API debe estar encendida para que el frontend genere resultados.</li>

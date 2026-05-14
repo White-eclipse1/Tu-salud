@@ -1,0 +1,230 @@
+schema: '2.0'
+stages:
+  clean_data:
+    cmd: python scripts/generate_cleaned_data.py
+    deps:
+    - path: Base-de-datos/raw/Hipertension_Arterial_Mexico.csv
+      hash: md5
+      md5: ae0f496b0086978f19578325cd48c2cf
+      size: 680328
+    - path: Base-de-datos/raw/Medicaldataset.csv
+      hash: md5
+      md5: 847f95b20f77a1bc868e471421d8feb2
+      size: 52355
+    - path: Base-de-datos/raw/diabetes.csv
+      hash: md5
+      md5: 4b890313fe22f1f5629382ab7a06dd07
+      size: 23375
+    - path: scripts/generate_cleaned_data.py
+      hash: md5
+      md5: 29db97dc73aac4a9ab9444c3b7c87215
+      size: 2427
+    outs:
+    - path: Base-de-datos/cleaned/Hipertension_Arterial_Mexico_cleaned.csv
+      hash: md5
+      md5: 4ea3df8e1a6b3593369be3f6adc01912
+      size: 685396
+    - path: Base-de-datos/cleaned/Medicaldataset_cleaned.csv
+      hash: md5
+      md5: ad56db82821dec7ef4085d74d81390b4
+      size: 45834
+    - path: Base-de-datos/cleaned/diabetes_cleaned.csv
+      hash: md5
+      md5: 583ce0f20129ef22016c8759ddcefe7c
+      size: 31234
+  train_diabetes:
+    cmd: python scripts/train_diabetes.py
+    deps:
+    - path: Base-de-datos/cleaned/diabetes_cleaned.csv
+      hash: md5
+      md5: 583ce0f20129ef22016c8759ddcefe7c
+      size: 31234
+    - path: scripts/train_diabetes.py
+      hash: md5
+      md5: 3374813acc214daa68e34baf730786be
+      size: 4754
+    outs:
+    - path: models/diabetes_metadata.json
+      hash: md5
+      md5: 99da5270c27e18f7824a176ae6b7c846
+      size: 2774
+    - path: models/diabetes_model.joblib
+      hash: md5
+      md5: 853459c84fd678922d98c28e036921b0
+      size: 189031
+    - path: models/diabetes_random_forest.joblib
+      hash: md5
+      md5: ee5565e702378abadaa9a5ac9091644a
+      size: 187481
+  train_paro_cardiaco:
+    cmd: python scripts/train_paro_cardiaco.py
+    deps:
+    - path: Base-de-datos/cleaned/Medicaldataset_cleaned.csv
+      hash: md5
+      md5: ad56db82821dec7ef4085d74d81390b4
+      size: 45834
+    - path: scripts/train_paro_cardiaco.py
+      hash: md5
+      md5: 9843be312303ddfa4ef90b7c9900e688
+      size: 3782
+    outs:
+    - path: models/paro_cardiaco_best_model.joblib
+      hash: md5
+      md5: 60b6434e922fef47fcc094207f06fe0d
+      size: 1279
+    - path: models/paro_cardiaco_metadata.json
+      hash: md5
+      md5: 9106c0c5d2195c62b00f96e1f3ea322c
+      size: 1503
+    - path: models/paro_cardiaco_model.joblib
+      hash: md5
+      md5: 9932a349edbc7173e6408b18f11f0671
+      size: 3122
+    - path: models/paro_cardiaco_scaler.joblib
+      hash: md5
+      md5: a9f12622a1c8eb17648c8bef2f2f2998
+      size: 1143
+  train_hipertension:
+    cmd: python scripts/train_hipertension.py
+    deps:
+    - path: Base-de-datos/cleaned/Hipertension_Arterial_Mexico_cleaned.csv
+      hash: md5
+      md5: 4ea3df8e1a6b3593369be3f6adc01912
+      size: 685396
+    - path: scripts/train_hipertension.py
+      hash: md5
+      md5: 995744f71c57a0678a95f71c003a02d1
+      size: 4669
+    outs:
+    - path: models/hipertension_best_model.joblib
+      hash: md5
+      md5: 64f54108b781f9f9d2f7b3463f21b6ca
+      size: 4708
+    - path: models/hipertension_metadata.json
+      hash: md5
+      md5: 423a2bb52eda2e4dff29af7405bbd8b1
+      size: 3386
+    - path: models/hipertension_model.joblib
+      hash: md5
+      md5: 69a2c4a4f0181544bb156741ce12cabb
+      size: 8950
+    - path: models/hipertension_scaler.joblib
+      hash: md5
+      md5: 0f5042def59944bac9b71f2c619c20d0
+      size: 2343
+  train_patient_profiles:
+    cmd: python scripts/train_patient_profiles.py
+    deps:
+    - path: Base-de-datos/cleaned/Hipertension_Arterial_Mexico_cleaned.csv
+      hash: md5
+      md5: 4ea3df8e1a6b3593369be3f6adc01912
+      size: 685396
+    - path: Base-de-datos/cleaned/Medicaldataset_cleaned.csv
+      hash: md5
+      md5: ad56db82821dec7ef4085d74d81390b4
+      size: 45834
+    - path: Base-de-datos/cleaned/diabetes_cleaned.csv
+      hash: md5
+      md5: 583ce0f20129ef22016c8759ddcefe7c
+      size: 31234
+    - path: models/diabetes_model.joblib
+      hash: md5
+      md5: 853459c84fd678922d98c28e036921b0
+      size: 189031
+    - path: models/hipertension_model.joblib
+      hash: md5
+      md5: 69a2c4a4f0181544bb156741ce12cabb
+      size: 8950
+    - path: models/paro_cardiaco_model.joblib
+      hash: md5
+      md5: 9932a349edbc7173e6408b18f11f0671
+      size: 3122
+    - path: scripts/train_patient_profiles.py
+      hash: md5
+      md5: 5281ec842216947ff5c2e92309878c69
+      size: 7567
+    outs:
+    - path: models/subtipos_kmeans.joblib
+      hash: md5
+      md5: 5c23ee9ad24bbf32a5f3f22c937bc305
+      size: 32785
+    - path: models/subtipos_metadata.json
+      hash: md5
+      md5: d78c35cb001827271d7782b97fb5212f
+      size: 18413
+    - path: models/subtipos_summary.csv
+      hash: md5
+      md5: 1cf1cdc99da1c89096aacc4fce543dd5
+      size: 652
+  validate_pipeline:
+    cmd: python scripts/validate_pipeline.py
+    deps:
+    - path: backend/main.py
+      hash: md5
+      md5: 9ba8af5fd6ef113a493e64bec2dd484b
+      size: 17342
+    - path: models/diabetes_metadata.json
+      hash: md5
+      md5: 99da5270c27e18f7824a176ae6b7c846
+      size: 2774
+    - path: models/diabetes_model.joblib
+      hash: md5
+      md5: 853459c84fd678922d98c28e036921b0
+      size: 189031
+    - path: models/diabetes_random_forest.joblib
+      hash: md5
+      md5: ee5565e702378abadaa9a5ac9091644a
+      size: 187481
+    - path: models/hipertension_best_model.joblib
+      hash: md5
+      md5: 64f54108b781f9f9d2f7b3463f21b6ca
+      size: 4708
+    - path: models/hipertension_metadata.json
+      hash: md5
+      md5: 423a2bb52eda2e4dff29af7405bbd8b1
+      size: 3386
+    - path: models/hipertension_model.joblib
+      hash: md5
+      md5: 69a2c4a4f0181544bb156741ce12cabb
+      size: 8950
+    - path: models/hipertension_scaler.joblib
+      hash: md5
+      md5: 0f5042def59944bac9b71f2c619c20d0
+      size: 2343
+    - path: models/paro_cardiaco_best_model.joblib
+      hash: md5
+      md5: 60b6434e922fef47fcc094207f06fe0d
+      size: 1279
+    - path: models/paro_cardiaco_metadata.json
+      hash: md5
+      md5: 9106c0c5d2195c62b00f96e1f3ea322c
+      size: 1503
+    - path: models/paro_cardiaco_model.joblib
+      hash: md5
+      md5: 9932a349edbc7173e6408b18f11f0671
+      size: 3122
+    - path: models/paro_cardiaco_scaler.joblib
+      hash: md5
+      md5: a9f12622a1c8eb17648c8bef2f2f2998
+      size: 1143
+    - path: models/subtipos_kmeans.joblib
+      hash: md5
+      md5: 5c23ee9ad24bbf32a5f3f22c937bc305
+      size: 32785
+    - path: models/subtipos_metadata.json
+      hash: md5
+      md5: d78c35cb001827271d7782b97fb5212f
+      size: 18413
+    - path: models/subtipos_summary.csv
+      hash: md5
+      md5: 1cf1cdc99da1c89096aacc4fce543dd5
+      size: 652
+    - path: scripts/validate_pipeline.py
+      hash: md5
+      md5: 64fc1853eb8cf24525c4ecc439e05383
+      size: 3592
+    outs:
+    - path: reports/pipeline_validation.json
+      hash: md5
+      md5: 585e559936ad35a1a250849d5398a6df
+      size: 1044

@@ -27,7 +27,7 @@ http://localhost:8000/predict
 ## Endpoints
 
 - `GET /health`: estado del servicio.
-- `POST /cluster`: ejecuta los modelos K-Means no supervisados y devuelve el cluster asignado por enfermedad.
+- `POST /cluster`: ejecuta los modelos K-Means no supervisados y devuelve el perfil exploratorio asignado por dataset.
 - `POST /predict`: recibe los campos del formulario y devuelve:
 
 ```json

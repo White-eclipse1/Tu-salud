@@ -1,4 +1,8 @@
-/Base-de-datos
+/Base-de-datos/**
+!/Base-de-datos/
+!/Base-de-datos/*.dvc
+/models
+/reports
 
 __pycache__/
 *.pyc

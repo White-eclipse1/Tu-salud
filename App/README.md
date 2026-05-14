@@ -12,7 +12,7 @@ uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
 
 2. Abre `App/index.html` en el navegador.
 
-El formulario primero envia los datos a `http://localhost:8000/cluster` para ubicar al paciente en los perfiles K-Means no supervisados. Despues llama a `http://localhost:8000/predict` y compara esos clusters contra las probabilidades supervisadas.
+El formulario primero envia los datos a `http://localhost:8000/cluster` para ubicar al paciente en perfiles K-Means no supervisados. Despues llama a `http://localhost:8000/predict` y compara esos perfiles contra las probabilidades supervisadas.
 
 ## Archivos
 

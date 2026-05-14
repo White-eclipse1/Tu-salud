@@ -1,0 +1,82 @@
+stages:
+  clean_data:
+    cmd: python scripts/generate_cleaned_data.py
+    deps:
+      - scripts/generate_cleaned_data.py
+      - Base-de-datos/raw/diabetes.csv
+      - Base-de-datos/raw/Hipertension_Arterial_Mexico.csv
+      - Base-de-datos/raw/Medicaldataset.csv
+    outs:
+      - Base-de-datos/cleaned/diabetes_cleaned.csv
+      - Base-de-datos/cleaned/Hipertension_Arterial_Mexico_cleaned.csv
+      - Base-de-datos/cleaned/Medicaldataset_cleaned.csv
+
+  train_diabetes:
+    cmd: python scripts/train_diabetes.py
+    deps:
+      - scripts/train_diabetes.py
+      - Base-de-datos/cleaned/diabetes_cleaned.csv
+    outs:
+      - models/diabetes_model.joblib
+      - models/diabetes_random_forest.joblib
+      - models/diabetes_metadata.json
+
+  train_paro_cardiaco:
+    cmd: python scripts/train_paro_cardiaco.py
+    deps:
+      - scripts/train_paro_cardiaco.py
+      - Base-de-datos/cleaned/Medicaldataset_cleaned.csv
+    outs:
+      - models/paro_cardiaco_model.joblib
+      - models/paro_cardiaco_best_model.joblib
+      - models/paro_cardiaco_scaler.joblib
+      - models/paro_cardiaco_metadata.json
+
+  train_hipertension:
+    cmd: python scripts/train_hipertension.py
+    deps:
+      - scripts/train_hipertension.py
+      - Base-de-datos/cleaned/Hipertension_Arterial_Mexico_cleaned.csv
+    outs:
+      - models/hipertension_model.joblib
+      - models/hipertension_best_model.joblib
+      - models/hipertension_scaler.joblib
+      - models/hipertension_metadata.json
+
+  train_patient_profiles:
+    cmd: python scripts/train_patient_profiles.py
+    deps:
+      - scripts/train_patient_profiles.py
+      - Base-de-datos/cleaned/diabetes_cleaned.csv
+      - Base-de-datos/cleaned/Hipertension_Arterial_Mexico_cleaned.csv
+      - Base-de-datos/cleaned/Medicaldataset_cleaned.csv
+      - models/diabetes_model.joblib
+      - models/paro_cardiaco_model.joblib
+      - models/hipertension_model.joblib
+    outs:
+      - models/subtipos_kmeans.joblib
+      - models/subtipos_metadata.json
+      - models/subtipos_summary.csv
+
+  validate_pipeline:
+    cmd: python scripts/validate_pipeline.py
+    deps:
+      - scripts/validate_pipeline.py
+      - backend/main.py
+      - models/diabetes_model.joblib
+      - models/diabetes_random_forest.joblib
+      - models/diabetes_metadata.json
+      - models/paro_cardiaco_model.joblib
+      - models/paro_cardiaco_best_model.joblib
+      - models/paro_cardiaco_scaler.joblib
+      - models/paro_cardiaco_metadata.json
+      - models/hipertension_model.joblib
+      - models/hipertension_best_model.joblib
+      - models/hipertension_scaler.joblib
+      - models/hipertension_metadata.json
+      - models/subtipos_kmeans.joblib
+      - models/subtipos_metadata.json
+      - models/subtipos_summary.csv
+    metrics:
+      - reports/pipeline_validation.json:
+          cache: false
