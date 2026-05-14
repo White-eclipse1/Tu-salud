@@ -1,0 +1,3 @@
+[fsspec.specs]
+sftp = sshfs.spec:SSHFileSystem
+ssh = sshfs.spec:SSHFileSystem

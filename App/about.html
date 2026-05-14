@@ -28,24 +28,24 @@
     <div class="container">
 
       <div class="page-hero">
-        <div class="page-hero-tag">Proyecto Academico - Machine Learning Medico</div>
+        <div class="page-hero-tag">Proyecto Educativo - Analisis Predictivo Medico</div>
         <h1>Acerca de<br><span class="accent">Tu Salud</span></h1>
-        <p>Sistema web que conecta una interfaz clinica con modelos entrenados para analizar perfiles K-Means y predicciones supervisadas de riesgo medico.</p>
+        <p>Sistema educativo de analisis predictivo de riesgos medicos que integra limpieza de datos, modelos supervisados, perfiles no supervisados con K-Means, versionado con DVC, una API FastAPI y una interfaz web estatica.</p>
       </div>
 
       <div class="about-full-card">
         <h2>Que hace el proyecto</h2>
         <p>
-          <strong style="color:var(--text-primary)">Tu Salud</strong> permite capturar datos clinicos de un paciente y enviarlos a un backend local hecho con FastAPI. El backend carga modelos guardados con <strong style="color:var(--text-primary)">joblib</strong> desde la carpeta <strong style="color:var(--text-primary)">models/</strong> y devuelve resultados para diabetes, hipertension arterial, paro cardiaco y una evaluacion general.
+          <strong style="color:var(--text-primary)">Tu Salud</strong> estima riesgos para diabetes, hipertension arterial y paro cardiaco a partir de datos clinicos. El proyecto combina un flujo reproducible de preparacion de datos, entrenamiento de modelos, generacion de perfiles de pacientes y consumo local desde una aplicacion web conectada a FastAPI.
         </p>
         <p style="margin-top:1rem">
-          El flujo actual usa primero el modelo no supervisado K-Means para ubicar al paciente dentro de grupos clinicos reales guardados en los metadatos. Despues ejecuta los modelos supervisados y compara si el grupo asignado tiene relacion con las probabilidades individuales.
+          La app hace dos lecturas complementarias: los modelos supervisados calculan una probabilidad individual por rubro y K-Means asigna al paciente a perfiles exploratorios por similitud estadistica. Estos perfiles no indican diagnostico; describen grupos parecidos dentro de los datos usados para el proyecto.
         </p>
 
         <div class="disclaimer-banner" style="margin-top:1.5rem;margin-bottom:0">
           <span class="icon">!</span>
           <p>
-            <strong>Aviso:</strong> los resultados son generados por modelos entrenados para fines academicos. No sustituyen una valoracion medica, no constituyen diagnostico y deben interpretarse solo como apoyo experimental.
+            <strong>Aviso:</strong> este proyecto no es un sistema de diagnostico medico. Las probabilidades son salidas de modelos entrenados con datasets especificos y deben interpretarse solo como apoyo academico o demostrativo.
           </p>
         </div>
       </div>

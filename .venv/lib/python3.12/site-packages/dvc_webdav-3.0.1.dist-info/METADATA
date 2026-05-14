@@ -1,0 +1,39 @@
+Metadata-Version: 2.4
+Name: dvc-webdav
+Version: 3.0.1
+Summary: webdav plugin for dvc
+Author-email: Iterative <support@dvc.org>
+Maintainer-email: Iterative <support@dvc.org>
+License-Expression: Apache-2.0
+Project-URL: Documentation, https://dvc.org/doc
+Project-URL: Source, https://github.com/iterative/dvc-webdav
+Keywords: dvc,webdav
+Classifier: Development Status :: 4 - Beta
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Requires-Python: >=3.9
+Description-Content-Type: text/x-rst
+License-File: LICENSE
+Requires-Dist: dvc
+Requires-Dist: webdav4>=0.9.3
+Provides-Extra: dev
+Requires-Dist: dvc-webdav[tests]; extra == "dev"
+Requires-Dist: mypy==1.19.0; extra == "dev"
+Provides-Extra: tests
+Requires-Dist: dvc[testing]; extra == "tests"
+Requires-Dist: pytest<9,>=7; extra == "tests"
+Requires-Dist: pytest-cov>=4.1.0; extra == "tests"
+Requires-Dist: pytest-xdist>=3.2; extra == "tests"
+Requires-Dist: wsgidav<5,>=3; extra == "tests"
+Requires-Dist: cheroot<12,>=8.6; extra == "tests"
+Requires-Dist: pytest-mock<4,>=3.15.1; extra == "tests"
+Dynamic: license-file
+
+dvc-webdav
+
+webdav plugin for dvc

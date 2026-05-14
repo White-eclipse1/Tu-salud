@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(jupyter nbconvert *)",
+      "Bash(python3)",
+      "Bash(.venv/bin/pip install *)",
+      "Bash(.venv/bin/python scripts/apply_rubric_updates.py)",
+      "Bash(.venv/bin/python -c \"import sklearn, pandas, numpy, matplotlib, seaborn, joblib; print\\('sklearn', sklearn.__version__\\); print\\('pandas', pandas.__version__\\)\")",
+      "Bash(.venv/bin/python -c \"import jupyter_client, nbclient; print\\('ok'\\)\")",
+      "Bash(.venv/bin/jupyter nbconvert *)",
+      "Bash(.venv/bin/python -c ' *)",
+      "Bash(.venv/bin/python)",
+      "Read(//Users/danielsebastianmaciasmacias/Library/CloudStorage/OneDrive-ITESO/**)",
+      "Read(//Users/danielsebastianmaciasmacias/Library/CloudStorage/**)",
+      "Bash(dvc --version)",
+      "Bash(.venv/bin/dvc remote *)",
+      "Bash(.venv/bin/dvc status *)",
+      "Read(//Users/danielsebastianmaciasmacias/Documents/**)",
+      "Read(//Users/danielsebastianmaciasmacias/**)",
+      "Bash(.venv/bin/dvc --version)",
+      "Bash(.venv/bin/dvc pull *)",
+      "Bash(.venv/bin/dvc fetch *)",
+      "Bash(.venv/bin/dvc cache *)",
+      "Bash(.venv/bin/dvc root *)",
+      "Bash(.venv/bin/dvc config *)",
+      "Bash(env)",
+      "Bash(.venv/bin/dvc data *)"
+    ]
+  }
+}

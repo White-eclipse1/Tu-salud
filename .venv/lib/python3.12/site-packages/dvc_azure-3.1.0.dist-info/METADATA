@@ -1,0 +1,49 @@
+Metadata-Version: 2.1
+Name: dvc-azure
+Version: 3.1.0
+Summary: azure plugin for dvc
+Author-email: Iterative <support@dvc.org>
+Maintainer-email: Iterative <support@dvc.org>
+License: Apache License 2.0
+Project-URL: Documentation, https://dvc.org/doc
+Project-URL: Source, https://github.com/iterative/dvc-azure
+Keywords: dvc,azure
+Classifier: Development Status :: 4 - Beta
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.9
+Description-Content-Type: text/x-rst
+License-File: LICENSE
+Requires-Dist: dvc
+Requires-Dist: adlfs >=2023.12.0
+Requires-Dist: azure-identity >=1.4.0
+Requires-Dist: knack
+Provides-Extra: tests
+Requires-Dist: wheel ==0.37.0 ; extra == 'tests'
+Requires-Dist: dvc[testing] ; extra == 'tests'
+Requires-Dist: pytest ==6.2.5 ; extra == 'tests'
+Requires-Dist: pytest-cov ==3.0.0 ; extra == 'tests'
+Requires-Dist: pytest-xdist ==2.4.0 ; extra == 'tests'
+Requires-Dist: pytest-mock ==3.6.1 ; extra == 'tests'
+Requires-Dist: pytest-lazy-fixture ==0.6.3 ; extra == 'tests'
+Requires-Dist: pytest-servers[azure] >=0.3.0 ; extra == 'tests'
+Requires-Dist: flaky ==3.7.0 ; extra == 'tests'
+Requires-Dist: mock ==4.0.3 ; extra == 'tests'
+Requires-Dist: wget ==3.2 ; extra == 'tests'
+Requires-Dist: filelock ==3.3.2 ; extra == 'tests'
+Requires-Dist: xmltodict ==0.12.0 ; extra == 'tests'
+Requires-Dist: Pygments ==2.10.0 ; extra == 'tests'
+Requires-Dist: collective.checkdocs ==0.2 ; extra == 'tests'
+Requires-Dist: pydocstyle ==6.1.1 ; extra == 'tests'
+Requires-Dist: mypy ==0.981 ; extra == 'tests'
+Requires-Dist: types-requests ==2.25.11 ; extra == 'tests'
+Requires-Dist: types-tabulate ==0.8.3 ; extra == 'tests'
+Requires-Dist: types-toml ==0.10.1 ; extra == 'tests'
+Requires-Dist: pywin32 >=225 ; (sys_platform == "win32") and extra == 'tests'
+
+dvc-azure
+
+azure plugin for dvc
